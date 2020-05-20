@@ -1,0 +1,68 @@
+---
+title: "dlMAPA_ALPA"
+author: "JCLAraujo"
+date: "20/05/2020"
+output: 
+  html_document:
+    keep_md: True
+  
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introdução
+Aqui vamos apenas carregar os mapas baixados da semana passada e plota-los no R
+
+# Passos
+Para conseguir usar o comando para a leitura do shapefile será necessário que rgdal esteja instalado e ativo.
+```{r, eval=FALSE}
+install.packages(c('raster', 'sp', 'rgdal', 'dplyr', 'XML', 'curl'))
+
+```
+
+Atente-se ao diretório em que os arquivos estão salvos para evitar erros e não esqueça de executar o download dos mapas novamente usando o script correto.
+
+```{r, "Script semana passada corrigido"}
+library(raster)
+library(sp)
+library(rgdal)
+library(dplyr)
+library(XML)
+library(curl)
+
+setwd("C:/MAPAS/lab_meet/maps")
+
+#CMA
+lista.files.uso.cma = readLines('http://geo.fbds.org.br/SP/CAMPINA_DO_MONTE_ALEGRE/USO/')
+lista.files.app.cma = readLines('http://geo.fbds.org.br/SP/CAMPINA_DO_MONTE_ALEGRE/APP/')
+
+lks.lista<-c(lista.files.uso.cma,lista.files.app.cma)
+lks<-getHTMLLinks(lks.lista, xpQuery = "//a/@href[contains(., 'SP')]")
+for (i in 1:(length(lks))){
+  destf<-paste("./data_use", strsplit(lks[i], "/")[[1]][5], sep="/")
+  curl_download((paste("http://geo.fbds.org.br", lks[i], sep="")),destfile = destf)
+}
+
+```
+
+Aqui começamos a carregar os mapas para o R. O comando responsável em carregar o shapefile como SpatialPolygonsDataFrame para dentro do R é o readOGR.
+
+```{r, "Carregando os mapas"}
+
+CMA_uso<-readOGR(dsn="./data_use",layer="SP_3509452_USO")
+CMA_app<-readOGR(dsn="./data_use",layer="SP_3509452_APP")
+CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
+```
+
+Nota-se que o "dsn" é o diretório do arquivo, sem o nome do shapefile, que deve ser colocado no "layer" sem a extensão. Isso faz com que todos os arquivos com o mesmo nome sejam carregados, pegando dessa forma todas as informações necessárias.
+
+Para a visualização dos mapas basta usar o comando plot(obj), sendo o "obj" o objeto em que o mapa foi salvo dentro do R
+
+```{r CMA_uso, echo=FALSE}
+par(mfrow=c(1,3),cex=0.5)
+
+plot(CMA_uso)
+plot(CMA_app)
+plot(CMA_all)
+```
