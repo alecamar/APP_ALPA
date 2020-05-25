@@ -58,17 +58,21 @@ plotKML(nasc, folder.name = normalizeFilename(deparse(substitute(nasc, env = par
 
 geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm", "google")[1], JSON = FALSE,
                     verbose = 0)
+lati<-geocode[1:1]
+long<-geocode[2:2]
+
 str(mapCMA)
 class(CMA_app)
 class(CMA_app.p)
 str(CMA_app.p, max.level = 2)
 CMA_app.p<-slot(CMA_app, "polygons")
 pol = SpatialPolygons(CMA_app.p)
-
+class(pol)
+str(pol, max.level = 2)
 mapCMA<-GetMap(center=geocode , size=c(640,640), sensor="true",  maptype="satellite", 
                NEWMAP=TRUE, type="google-s", format= "jpg", tileDir = "./data_use")
 
 PlotOnStaticMap(mapCMA)
-
-PlotPolysOnStaticMap(mapCMA, pol, col = "transparent", border = "red")##Essa linha esta com erro
+PlotOnStaticMap(CMA_app, lat=lati, lon=long, col=(c("dark green","yellow","purple","blue","red")), add=TRUE)
+#PlotPolysOnStaticMap(mapCMA, pol, col="yellow", border = "red", add = TRUE)##Essa linha esta com erro
 
