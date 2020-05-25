@@ -5,6 +5,7 @@ library(sp)
 library(plotKML)
 library(RgoogleMaps)
 library(maptools)
+library(jpeg)
 
 ##################Carregar exclusivamente APPS#####################
 
@@ -27,7 +28,7 @@ plot(CMA_app[mda,], col = "blue", border="transparent", add=TRUE)
 
 app_nascente<- CMA_app@data$HIDRO == "nascente"
 plot(CMA_app[app_nascente,], col = "red", border="transparent", add=TRUE)
-
+nasc<-CMA_app[app_nascente,]
 legend("topright", c("APP curso d'água 0 - 10m", "APP curso d'água 10 - 50m", "APP curso d'água 50 - 200m", "APP nascentes", "Massa d'água"), fill=c("dark green", "yellow", "purple", "red", "orange"))
 axis(1)
 axis(2)
@@ -45,10 +46,11 @@ area_nasc<-((pi*50^2)*289)
 names(CMA_app)
 
 ##os plots funcionam, criando os .kml, mas exporta apenas pontos e não os poligonos
-plotKML(, folder.name = normalizeFilename(deparse(substitute(CMA_app, env = parent.frame()))), 
+plotKML(CMA_app, folder.name = normalizeFilename(deparse(substitute(CMA_app, env = parent.frame()))), 
         file.name = paste("APP_CMA", ".kml"), plot.labpt = TRUE, balloon=TRUE)
 
-plotKML(, plot.labpt = TRUE,labels = "Nascente", balloon=TRUE) 
+plotKML(nasc, folder.name = normalizeFilename(deparse(substitute(nasc, env = parent.frame()))), 
+        file.name = paste("nasc", ".kml"), plot.labpt = TRUE, balloon=TRUE) 
 
 #?plotKML
 
@@ -57,9 +59,12 @@ plotKML(, plot.labpt = TRUE,labels = "Nascente", balloon=TRUE)
 geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm", "google")[1], JSON = FALSE,
                     verbose = 0)
 
-mapCMA<-GetMap(center=geocode , size=c(640,640), sensor="true",  maptype="satellite", NEWMAP=TRUE, type="google-s", tileDir = "./data_use")
+mapCMA<-GetMap(center=geocode , size=c(640,640), sensor="true",  maptype="satellite", 
+               NEWMAP=TRUE, type="google-s", format= "jpg", tileDir = "./data_use")
 
-PlotPolysOnStaticMap(mapCMA, CMA_app, col = "transparent", border = "transparent")##Essa linha esta com erro
+PlotPolysOnStaticMap(mapCMA, CMA_app, col = "transparent", border = "red")##Essa linha esta com erro
 
 str(mapCMA)
-str
+class(CMA_app)
+
+CMA_app.p<-slot(CMA_app, "polygons")
