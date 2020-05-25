@@ -39,7 +39,7 @@ a<-disaggregate(CMA_app[app_nascente,])
 
 str(a, max.level = 2)
 
-area_nasc<-((pi*50^2)*289)
+area_nasc<-((pi*50^2)*289)/10000
 
 ########################################Código para a criação de um .kml (google earth) *não funciona 100%*##########################
 
@@ -58,13 +58,17 @@ plotKML(nasc, folder.name = normalizeFilename(deparse(substitute(nasc, env = par
 
 geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm", "google")[1], JSON = FALSE,
                     verbose = 0)
+str(mapCMA)
+class(CMA_app)
+class(CMA_app.p)
+str(CMA_app.p, max.level = 2)
+CMA_app.p<-slot(CMA_app, "polygons")
+pol = SpatialPolygons(CMA_app.p)
 
 mapCMA<-GetMap(center=geocode , size=c(640,640), sensor="true",  maptype="satellite", 
                NEWMAP=TRUE, type="google-s", format= "jpg", tileDir = "./data_use")
 
-PlotPolysOnStaticMap(mapCMA, CMA_app, col = "transparent", border = "red")##Essa linha esta com erro
+PlotOnStaticMap(mapCMA)
 
-str(mapCMA)
-class(CMA_app)
+PlotPolysOnStaticMap(mapCMA, pol, col = "transparent", border = "red")##Essa linha esta com erro
 
-CMA_app.p<-slot(CMA_app, "polygons")
