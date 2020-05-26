@@ -2,3 +2,15 @@
 .Rhistory
 .RData
 .Ruserdata
+<<<<<<< HEAD
+=======
+.jpeg
+.jpg
+.cpg
+.dbf
+.prj
+.shp
+.xml
+.shx
+.html
+>>>>>>> d52ae8bc35d0ef92f9ece7ddc33b33c71aa9414f
