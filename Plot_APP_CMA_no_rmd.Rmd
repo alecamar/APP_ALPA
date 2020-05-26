@@ -2,10 +2,24 @@
 title: "Plot_APP_CMA"
 author: "ACMartensen"
 date: "5/25/2020"
-output: html_document
+output: 
+  html_document:
+    keep_md: True
+    toc: True
 ---
 
 #Inicializacao
+
+
+Instala os pacotes nacessarios. Mas precisa verificar se tah usando tudo isso mesmo
+```{r, "install packages"}
+list.of.packages <- c("rgdal", "rgeos", "dplyr", "sp", "plotKML", "RgoogleMaps", "maptools", "jpeg", "ggmap", "raptr", "raster")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
 
 Verificar se precisa de tudo isso mesmo
 ```{r setup}
