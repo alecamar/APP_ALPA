@@ -6,6 +6,9 @@ library(plotKML)
 library(RgoogleMaps)
 library(maptools)
 library(jpeg)
+library(ggmap)
+library(raptr)
+library(raster)
 
 ##################Carregar exclusivamente APPS#####################
 
@@ -62,9 +65,46 @@ geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm"
 mapCMA<-GetMap(center=geocode , size=c(640,640), sensor="true",  maptype="satellite", 
                NEWMAP=TRUE, type="google-s", format= "jpg", tileDir = "./data_use")
 
-PlotPolysOnStaticMap(mapCMA, CMA_app, col = "transparent", border = "red")##Essa linha esta com erro
+PlotPolysOnStaticMap(mapCMA, CMA_app)##Essa linha esta com erro
 
 str(mapCMA)
-class(CMA_app)
+str(CMA_app, max.level=2)
 
 CMA_app.p<-slot(CMA_app, "polygons")
+
+data <- fortify(CMA_app)
+
+cma.z13<-get_map(location = c(lon = -48.48019, lat = -23.59357),
+             zoom = 13, scale = "auto", maptype = "satellite", source = "google", 
+             force = ifelse(source == "google", TRUE, FALSE), messaging = FALSE, 
+             crop = TRUE, color = "color", language = "en")
+
+
+### Converte ggmap obj to raster
+
+mgmap <- as.matrix(cma.z13)
+vgmap <- as.vector(mgmap)
+vgmaprgb <- col2rgb(vgmap)
+gmapr <- matrix(vgmaprgb[1, ], ncol = ncol(mgmap), nrow = nrow(mgmap))
+gmapg <- matrix(vgmaprgb[2, ], ncol = ncol(mgmap), nrow = nrow(mgmap))
+gmapb <- matrix(vgmaprgb[3, ], ncol = ncol(mgmap), nrow = nrow(mgmap))
+rgmaprgb <- brick(raster(gmapr), raster(gmapg), raster(gmapb))
+rm(gmapr, gmapg, gmapb)
+
+
+projection(rgmaprgb) <- CRS("+init=epsg:3857")
+extent(rgmaprgb) <- unlist(attr(cma, which = "bb"))[c(2, 4, 1, 3)]
+rgmaprgb
+
+plotRGB(rgmaprgb)
+
+proj4string(rgmaprgb)
+
+#ge<-projectRaster(rgmaprgb, crs=proj4string(CMA_app))
+
+cma_app<-spTransform(CMA_app, CRS(proj4string(rgmaprgb)))
+plotRGB(rgmaprgb)
+#plot(cma_app, add=TRUE, col="red")
+plot(cma_app, add=TRUE, border="red", col="red")
+axis(1)
+
