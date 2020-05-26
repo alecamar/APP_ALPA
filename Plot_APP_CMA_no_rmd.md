@@ -8,10 +8,10 @@ output:
     toc: True
 ---
 
-#Inicializacao
+# Inicializacao
 
 
-Instala os pacotes nacessarios. Mas precisa verificar se tah usando tudo isso mesmo
+Instala os pacotes necessarios. Mas precisa verificar se tah usando tudo isso mesmo
 
 ```r
 list.of.packages <- c("rgdal", "rgeos", "dplyr", "sp", "plotKML", "RgoogleMaps", "maptools", "jpeg", "ggmap", "raptr", "raster")
@@ -244,9 +244,10 @@ CMA_app<-readOGR(dsn="./data_use",layer="SP_3509452_APP")
 ## Integer64 fields read as strings:  GEOCODIGO
 ```
 
-#Analises
+# Analises
 
-##Dados gerais de app
+## Dados gerais de app
+
 Verifica dados APPs
 
 ```r
@@ -312,7 +313,7 @@ area_nasc<-((pi*50^2)*length(a@polygons))/10000
 
 Em CMA são 289 nascentes com área total de 226.98ha
 
-##Gera os kmls
+## Gera os kmls
 
 
 ```r
@@ -352,7 +353,7 @@ plotKML(nasc, folder.name = normalizeFilename(deparse(substitute(nasc, env = par
 ## [1] 37
 ```
 
-##Plota cm imagem do GE de fundo
+## Plota cm imagem do GE de fundo
 
 ```r
 geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm", "google")[1], JSON = FALSE,
@@ -470,6 +471,8 @@ plot(cma_nasc, add=TRUE, border="red", col="red")
 ```r
 #axis(1)
 ```
+
+
 
 
 

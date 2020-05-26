@@ -8,10 +8,10 @@ output:
     toc: True
 ---
 
-#Inicializacao
+# Inicializacao
 
 
-Instala os pacotes nacessarios. Mas precisa verificar se tah usando tudo isso mesmo
+Instala os pacotes necessarios. Mas precisa verificar se tah usando tudo isso mesmo
 ```{r, "install packages"}
 list.of.packages <- c("rgdal", "rgeos", "dplyr", "sp", "plotKML", "RgoogleMaps", "maptools", "jpeg", "ggmap", "raptr", "raster")
 
@@ -42,9 +42,10 @@ Carrega os dados das APPS
 CMA_app<-readOGR(dsn="./data_use",layer="SP_3509452_APP")
 ```
 
-#Analises
+# Analises
 
-##Dados gerais de app
+## Dados gerais de app
+
 Verifica dados APPs
 ```{r}
 cbind(CMA_app@data[,2], CMA_app@data[,5:7])
@@ -84,7 +85,7 @@ area_nasc<-((pi*50^2)*length(a@polygons))/10000
 
 Em CMA são `r length(a@polygons)` nascentes com área total de `r round(area_nasc, 2)`ha
 
-##Gera os kmls
+## Gera os kmls
 
 ```{r, eval=FALSE}
 plotKML(CMA_app, folder.name = normalizeFilename(deparse(substitute(CMA_app, env = parent.frame()))), 
@@ -99,7 +100,7 @@ plotKML(nasc, folder.name = normalizeFilename(deparse(substitute(nasc, env = par
         file.name = paste("nasc", ".kml"), plot.labpt = TRUE, balloon=TRUE) 
 ```
 
-##Plota cm imagem do GE de fundo
+## Plota cm imagem do GE de fundo
 ```{r "codigo q o Julio mandou", eval=FALSE}
 geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm", "google")[1], JSON = FALSE,
                     verbose = 0)
@@ -172,12 +173,13 @@ cma_nasc<-spTransform(nasc, CRS(proj4string(rgmaprgb)))
 
 Plota tudo
 ```{r}
-
 plotRGB(rgmaprgb)
 #plot(cma_app, add=TRUE, col="red")
 plot(cma_nasc, add=TRUE, border="red", col="red")
 #axis(1)
 ```
+
+
 
 
 
