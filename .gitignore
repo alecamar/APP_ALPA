@@ -2,8 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-<<<<<<< HEAD
-=======
 .jpeg
 .jpg
 .cpg
@@ -13,8 +11,5 @@
 .xml
 .shx
 .html
-<<<<<<< HEAD
->>>>>>> d52ae8bc35d0ef92f9ece7ddc33b33c71aa9414f
-=======
 .kml
->>>>>>> ed2b9dd884dfc7e021d765c78c57cfe4349247bd
+.rda
