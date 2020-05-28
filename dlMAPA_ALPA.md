@@ -38,11 +38,11 @@ library(rgdal)
 ## rgdal: version: 1.4-8, (SVN revision 845)
 ##  Geospatial Data Abstraction Library extensions to R successfully loaded
 ##  Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
-##  Path to GDAL shared files: C:/Users/acmar/Documents/R/win-library/3.6/rgdal/gdal
+##  Path to GDAL shared files: C:/Users/patri/Documents/R/win-library/4.0/rgdal/gdal
 ##  GDAL binary built with GEOS: TRUE 
 ##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
-##  Path to PROJ.4 shared files: C:/Users/acmar/Documents/R/win-library/3.6/rgdal/proj
-##  Linking to sp version: 1.3-2
+##  Path to PROJ.4 shared files: C:/Users/patri/Documents/R/win-library/4.0/rgdal/proj
+##  Linking to sp version: 1.4-1
 ```
 
 ```r
@@ -82,6 +82,20 @@ Script para download dos dados.
 ```r
 dir.create("./data_use")
 
+#Itapetininga
+lista.files.uso.itapetininga =
+readLines('http://geo.fbds.org.br/SP/ITAPETININGA/USO/')
+lista.files.app.itapetininga =
+readLines('http://geo.fbds.org.br/SP/ITAPETININGA/APP/')
+
+lks.lista<-c(lista.files.uso.itapetininga,lista.files.app.itapetininga)
+lks<-getHTMLLinks(lks.lista, xpQuery = "//a/@href[contains(., 'SP')]")
+for (i in 1:(length(lks))){
+  destf<-paste("./data_use", strsplit(lks[i], "/")[[1]][5], sep="/")
+  curl_download((paste("http://geo.fbds.org.br", lks[i], sep="")),destfile = destf)
+}
+
+
 #CMA
 lista.files.uso.cma = readLines('http://geo.fbds.org.br/SP/CAMPINA_DO_MONTE_ALEGRE/USO/')
 lista.files.app.cma = readLines('http://geo.fbds.org.br/SP/CAMPINA_DO_MONTE_ALEGRE/APP/')
@@ -98,12 +112,46 @@ Aqui começamos a carregar os mapas para o R. O comando responsável em carregar
 
 
 ```r
+ITAPETININGA_uso<-readOGR(dsn="./data_use",layer="SP_3522307_USO")
+```
+
+```
+## OGR data source with driver: ESRI Shapefile 
+## Source: "C:\Users\patri\Desktop\R-Studio\APP_ALPA\APP_ALPA\data_use", layer: "SP_3522307_USO"
+## with 6 features
+## It has 6 fields
+```
+
+```r
+ITAPETININGA_app<-readOGR(dsn="./data_use",layer="SP_3522307_APP")
+```
+
+```
+## OGR data source with driver: ESRI Shapefile 
+## Source: "C:\Users\patri\Desktop\R-Studio\APP_ALPA\APP_ALPA\data_use", layer: "SP_3522307_APP"
+## with 6 features
+## It has 7 fields
+## Integer64 fields read as strings:  GEOCODIGO
+```
+
+```r
+ITAPETININGA_all<-readOGR(dsn="./data_use",layer="SP_3522307_APP_USO")
+```
+
+```
+## OGR data source with driver: ESRI Shapefile 
+## Source: "C:\Users\patri\Desktop\R-Studio\APP_ALPA\APP_ALPA\data_use", layer: "SP_3522307_APP_USO"
+## with 5 features
+## It has 6 fields
+```
+
+```r
 CMA_uso<-readOGR(dsn="./data_use",layer="SP_3509452_USO")
 ```
 
 ```
 ## OGR data source with driver: ESRI Shapefile 
-## Source: "G:\My Drive\UFSCar\Projetos\teste\APPs_ALPA\data_use", layer: "SP_3509452_USO"
+## Source: "C:\Users\patri\Desktop\R-Studio\APP_ALPA\APP_ALPA\data_use", layer: "SP_3509452_USO"
 ## with 6 features
 ## It has 6 fields
 ```
@@ -114,7 +162,7 @@ CMA_app<-readOGR(dsn="./data_use",layer="SP_3509452_APP")
 
 ```
 ## OGR data source with driver: ESRI Shapefile 
-## Source: "G:\My Drive\UFSCar\Projetos\teste\APPs_ALPA\data_use", layer: "SP_3509452_APP"
+## Source: "C:\Users\patri\Desktop\R-Studio\APP_ALPA\APP_ALPA\data_use", layer: "SP_3509452_APP"
 ## with 5 features
 ## It has 7 fields
 ## Integer64 fields read as strings:  GEOCODIGO
@@ -126,7 +174,7 @@ CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
 
 ```
 ## OGR data source with driver: ESRI Shapefile 
-## Source: "G:\My Drive\UFSCar\Projetos\teste\APPs_ALPA\data_use", layer: "SP_3509452_APP_USO"
+## Source: "C:\Users\patri\Desktop\R-Studio\APP_ALPA\APP_ALPA\data_use", layer: "SP_3509452_APP_USO"
 ## with 5 features
 ## It has 6 fields
 ```
@@ -134,6 +182,18 @@ CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
 Nota-se que o "dsn" é o diretório do arquivo, sem o nome do shapefile, que deve ser colocado no "layer" sem a extensão. Isso faz com que todos os arquivos com o mesmo nome sejam carregados, pegando dessa forma todas as informações necessárias.
 
 Para a visualização dos mapas basta usar o comando plot(obj), sendo o "obj" o objeto em que o mapa foi salvo dentro do R
+
+```r
+plot(CMA_all)
+```
+
+![](dlMAPA_ALPA_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
+plot(ITAPETININGA_all)
+```
+
+![](dlMAPA_ALPA_files/figure-html/unnamed-chunk-3-2.png)<!-- -->
 
 Plotando o uso do solo
 
@@ -216,7 +276,7 @@ axis(2)
 plot(CMA_all)
 ```
 
-<img src="dlMAPA_ALPA_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="dlMAPA_ALPA_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 
 Tipos de APPs
 
