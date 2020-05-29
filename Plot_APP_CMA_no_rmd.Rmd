@@ -108,8 +108,14 @@ geocode<-getGeoCode("Campina do Monte Alegre, São Paulo, Brasil", API = c("osm"
 mapCMA<-GetMap(center=geocode , size=c(640,640), sensor="true",  maptype="satellite", 
                NEWMAP=TRUE, type="google-s", format= "jpg", tileDir = "./data_use")
 
+pgeo<-spTransform(CMA_app, CRS('+proj=longlat +datum=WGS84'))
+CMA_app.p<-slot(CMA_app, "polygons")
+PlotOnStaticMap(mapCMA)
 PlotPolysOnStaticMap(mapCMA, CMA_app)##Essa linha esta com erro
+
+
 ```
+
 
 Baixa imagem do GE com o **get_map**
 ```{r}
