@@ -61,10 +61,21 @@ Plota o MW para 2017
 ```{r, fig.align='center'}
 plot(r17.focal)
 #plot(r17, add=TRUE, col=c("transparent", "black"))
+
+
+#Eh legal colocar as florestas em preto, mas nessa escala não tah dando para ver onde ficam os "potenciais corredores". Se aumentar o tamanho da window no MW tvz de para ver.
 ```
 
 
-#Tvz criar um novo script com as coisas daqui para baixo?
+
+# Tvz testar mais alguns tamanhos de janela? 
+
+# Tvz criar um novo script com as coisas daqui para baixo?
+
+
+
+
+
 Aqui verificamos quantos existe de area florestada nas APPs (Falta coisa)
 ```{r, eval=TRUE}
 CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")

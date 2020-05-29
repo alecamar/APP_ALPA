@@ -156,7 +156,20 @@ plot(r17.focal)
 
 ```r
 #plot(r17, add=TRUE, col=c("transparent", "black"))
+
+
+#Eh legal colocar as florestas em preto, mas nessa escala não tah dando para ver onde ficam os "potenciais corredores". Se aumentar o tamanho da window no MW tvz de para ver.
 ```
+
+
+
+# Tvz testar mais alguns tamanhos de janela? 
+
+# Tvz criar um novo script com as coisas daqui para baixo?
+
+
+
+
 
 Aqui verificamos quantos existe de area florestada nas APPs (Falta coisa)
 
@@ -190,7 +203,7 @@ CMA_all@data
 ## 4  1925.9400
 ```
 
-Calculo APP
+Cálculo APP
 
 ```r
 cl.uso<-unique(CMA_all@data$CLASSE_USO)
