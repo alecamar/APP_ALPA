@@ -37,11 +37,20 @@ r07[r07 == 3] <- 1
 
 m<-matrix(1, nrow=11, ncol=11)
 r07.focal<-focal(r07, m, fun=mean)
+
+m1<-matrix(1, nrow=15, ncol=15)
+r07m1.focal<-focal(r07, m1, fun=mean)
+
+m2<-matrix(1, nrow=21, ncol=21)
+r07m2.focal<-focal(r07, m2, fun=mean)
 ```
 
 Plota o MW para 2007
 ```{r, fig.align='center'}
+par(mfrow=c(1,3))
 plot(r07.focal)
+plot(r07m1.focal)
+plot(r07m2.focal)
 #plot(r07, add=TRUE, col=c("transparent", "black"))
 ```
 
@@ -55,11 +64,21 @@ r17[r17 == 3] <- 1
 
 m<-matrix(1, nrow=11, ncol=11)
 r17.focal<-focal(r17, m, fun=mean)
+
+m1<-matrix(1, nrow=15, ncol=15)
+r17m1.focal<-focal(r17, m1, fun=mean)
+
+m2<-matrix(1, nrow=21, ncol=21)
+r17m2.focal<-focal(r17, m2, fun=mean)
 ```
 
 Plota o MW para 2017
 ```{r, fig.align='center'}
+
+par(mfrow=c(1,3))
 plot(r17.focal)
+plot(r17m1.focal)
+plot(r17m2.focal)
 #plot(r17, add=TRUE, col=c("transparent", "black"))
 
 
