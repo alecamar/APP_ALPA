@@ -8,42 +8,78 @@ output:
     toc: True
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Introdução
 
-inline_hook <- function(x) {
-  if (is.numeric(x)) {
-    format(x, digits = 2)
-  } else x
-}
-knitr::knit_hooks$set(inline = inline_hook)
+Nesse script buscamos usar a técnica de "Moving Window" para avaliar os potenciais corredores de vegetação nativa no município de Campina do Monte Alegre, SP. 
+
+Nosso objetivo com essa análise é subsidiar estratégias para a priorização de áreas para a restauração.
+
+# instalando e carregando os pacotes necessários
+
+Verifica se os pacotes necessários estão instalados
+```{r, echo=FALSE}
+list.of.packages <- "raster"
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
 ```
 
-Carrega os pacotes 
-```{r}
+Carrega os pacotes necessários 
+```{r, message=FALSE}
 require(raster)
-require(rgdal)
-require(dplyr)
-require(plyr)
 ```
 
-Aplica MW no raster referente a 2007
+# Carregando os dados
+
+Carrega o raster de 2007 e de 2017
 ```{r}
 r07<-raster("./data_use/raster/RASTER_CMA_07.tif")
+r17<-raster("./data_use/raster/RASTER_CMA_017.tif")
+```
 
+# Análises
+
+## Reclassificando
+Primeiro iremos reclassificar ambos os rasters, para transformar a vegetação nativa em 1 e todo o resto em 0.
+```{r}
 r07[r07 < 3] <- 0
 r07[r07 > 3] <- 0
 r07[r07 == 3] <- 1
 
+r17[r17 < 3] <- 0
+r17[r17 > 3] <- 0
+r17[r17 == 3] <- 1
+```
+
+
+## Criando as janelas voadoras
+
+Agora iremos criar as janelas voadoras. Iremos definir o tamanho desas janelas. Lembrando que esse tamanho é dado em número de pixels, e ele precisa sempre ser impar, para ter o pixel focal no meio. Existem outras formas de se fazer essas janelas, inclusive dando grande flexibilidade para tamanho e formato, mas não iremos usar no momento.
+
+```{r}
 m11<-matrix(1, nrow=11, ncol=11)
-r07.m11.focal<-focal(r07, m11, fun=mean)
-
 m15<-matrix(1, nrow=15, ncol=15)
-r07.m15.focal<-focal(r07, m15, fun=mean)
-
 m21<-matrix(1, nrow=21, ncol=21)
+```
+
+## Rodando o MW (funcao focal)
+Aplica MW no raster referente a 2007
+```{r}
+r07.m11.focal<-focal(r07, m11, fun=mean)
+r07.m15.focal<-focal(r07, m15, fun=mean)
 r07.m21.focal<-focal(r07, m21, fun=mean)
 ```
+
+Aplica o MW no raster referente a 2017
+```{r, fig.align='center'}
+r17.m11.focal<-focal(r17, m11, fun=mean)
+r17.m15.focal<-focal(r17, m15, fun=mean)
+r17.m21.focal<-focal(r17, m21, fun=mean)
+```
+
+## Potando os resultados
 
 Plota o MW para 2007
 ```{r, fig.align='center', fig.width=10}
@@ -51,85 +87,12 @@ par(mfrow=c(1,3))
 plot(r07.m11.focal, main="2007, 330m")
 plot(r07.m15.focal, main="2007, 450m")
 plot(r07.m21.focal, main="2007, 630m")
-#plot(r07, add=TRUE, col=c("transparent", "black"))
-```
-
-Aplica o MW no raster referente a 2017
-```{r, fig.align='center'}
-r17<-raster("./data_use/raster/RASTER_CMA_017.tif")
-
-r17[r17 < 3] <- 0
-r17[r17 > 3] <- 0
-r17[r17 == 3] <- 1
-
-m11<-matrix(1, nrow=11, ncol=11)
-r17.m11.focal<-focal(r17, m11, fun=mean)
-
-m15<-matrix(1, nrow=15, ncol=15)
-r17.m15.focal<-focal(r17, m15, fun=mean)
-
-m21<-matrix(1, nrow=21, ncol=21)
-r17.m21.focal<-focal(r17, m21, fun=mean)
 ```
 
 Plota o MW para 2017
-```{r, fig.align='center'}
-
+```{r, fig.align='center', fig.width=10}
 par(mfrow=c(1,3))
 plot(r17.m11.focal, main="2017, 330m")
 plot(r17.m15.focal, main="2017, 450m")
 plot(r17.m21.focal, main="2017, 630m")
-#plot(r17, add=TRUE, col=c("transparent", "black"))
-
-
-#Eh legal colocar as florestas em preto, mas nessa escala não tah dando para ver onde ficam os "potenciais corredores". Se aumentar o tamanho da window no MW tvz de para ver.
-```
-
-
-# Tvz criar um novo script com as coisas daqui para baixo?
-
-
-
-
-
-Aqui verificamos quantos existe de area florestada nas APPs (Falta coisa)
-```{r, eval=TRUE}
-CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
-
-CMA_all@data
-
-```
-
-Cálculo APP
-```{r}
-cl.uso<-unique(CMA_all@data$CLASSE_USO)
-
-tot.app<-sum(CMA_all@data$AREA_HA)
-
-tot.nat<-CMA_all@data[3,"AREA_HA"]+CMA_all@data[4,"AREA_HA"]
-```
-
-Em CMA temos um total de `r round(tot.app,2)` ha, sendo que apenas `r tot.nat/tot.app*100`% encontra-se preservada, um total de `r tot.nat` hectares de vegetação nativa.
-
-**Total a ser restaurado = `r tot.app-tot.nat` ha.**
-
-```{r, eval=FALSE}
-ff<-mapvalues(ff, from = c(
-  "área antropizada", "área edificada", "silvicultura", 
-  "formação florestal", "formação não florestal"), to = c(0,0,0,1,1))
-fft<-ff == 1
-ab<-disaggregate(CMA_all[fft,])
-
-```
-
-Função para verificar Fragmentos ligados por APP (Falta coisa)
-```{r, eval=FALSE}
-clip.outside<-function(area2clip, clippingArea){
-  
-  gI <- gIntersects(area2clip, clippingArea, byid = TRUE )
-  clip.out.r <- area2clip[ which(gI) , ]
-  return(clip.out.r)
-}
-
-APP_Ligadas<-clip.outside(,)
 ```
