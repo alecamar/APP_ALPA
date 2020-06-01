@@ -33,16 +33,14 @@ require(rgdal)
 ```
 
 ```
-## rgdal: version: 1.5-8, (SVN revision 990)
-## Geospatial Data Abstraction Library extensions to R successfully loaded
-## Loaded GDAL runtime: GDAL 2.2.2, released 2017/09/15
-## Path to GDAL shared files: /usr/share/gdal/2.2
-## GDAL binary built with GEOS: TRUE 
-## Loaded PROJ runtime: Rel. 4.9.2, 08 September 2015, [PJ_VERSION: 492]
-## Path to PROJ shared files: (autodetected)
-## Linking to sp version:1.4-2
-## To mute warnings of possible GDAL/OSR exportToProj4() degradation,
-## use options("rgdal_show_exportToProj4_warnings"="none") before loading rgdal.
+## rgdal: version: 1.4-8, (SVN revision 845)
+##  Geospatial Data Abstraction Library extensions to R successfully loaded
+##  Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
+##  Path to GDAL shared files: C:/Users/acmar/Documents/R/win-library/3.6/rgdal/gdal
+##  GDAL binary built with GEOS: TRUE 
+##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+##  Path to PROJ.4 shared files: C:/Users/acmar/Documents/R/win-library/3.6/rgdal/proj
+##  Linking to sp version: 1.3-2
 ```
 
 ```r
@@ -119,23 +117,23 @@ r07[r07 < 3] <- 0
 r07[r07 > 3] <- 0
 r07[r07 == 3] <- 1
 
-m<-matrix(1, nrow=11, ncol=11)
-r07.focal<-focal(r07, m, fun=mean)
+m11<-matrix(1, nrow=11, ncol=11)
+r07.m11.focal<-focal(r07, m11, fun=mean)
 
-m1<-matrix(1, nrow=15, ncol=15)
-r07m1.focal<-focal(r07, m1, fun=mean)
+m15<-matrix(1, nrow=15, ncol=15)
+r07.m15.focal<-focal(r07, m15, fun=mean)
 
-m2<-matrix(1, nrow=21, ncol=21)
-r07m2.focal<-focal(r07, m2, fun=mean)
+m21<-matrix(1, nrow=21, ncol=21)
+r07.m21.focal<-focal(r07, m21, fun=mean)
 ```
 
 Plota o MW para 2007
 
 ```r
 par(mfrow=c(1,3))
-plot(r07.focal)
-plot(r07m1.focal)
-plot(r07m2.focal)
+plot(r07.m11.focal, main="2007, 330m")
+plot(r07.m15.focal, main="2007, 450m")
+plot(r07.m21.focal, main="2007, 630m")
 ```
 
 <img src="MW_FF_CMA_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
@@ -153,23 +151,23 @@ r17[r17 < 3] <- 0
 r17[r17 > 3] <- 0
 r17[r17 == 3] <- 1
 
-m<-matrix(1, nrow=11, ncol=11)
-r17.focal<-focal(r17, m, fun=mean)
+m11<-matrix(1, nrow=11, ncol=11)
+r17.m11.focal<-focal(r17, m11, fun=mean)
 
-m1<-matrix(1, nrow=15, ncol=15)
-r17m1.focal<-focal(r17, m1, fun=mean)
+m15<-matrix(1, nrow=15, ncol=15)
+r17.m15.focal<-focal(r17, m15, fun=mean)
 
-m2<-matrix(1, nrow=21, ncol=21)
-r17m2.focal<-focal(r17, m2, fun=mean)
+m21<-matrix(1, nrow=21, ncol=21)
+r17.m21.focal<-focal(r17, m21, fun=mean)
 ```
 
 Plota o MW para 2017
 
 ```r
 par(mfrow=c(1,3))
-plot(r17.focal)
-plot(r17m1.focal)
-plot(r17m2.focal)
+plot(r17.m11.focal, main="2017, 330m")
+plot(r17.m15.focal, main="2017, 450m")
+plot(r17.m21.focal, main="2017, 630m")
 ```
 
 <img src="MW_FF_CMA_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
@@ -181,9 +179,6 @@ plot(r17m2.focal)
 #Eh legal colocar as florestas em preto, mas nessa escala não tah dando para ver onde ficam os "potenciais corredores". Se aumentar o tamanho da window no MW tvz de para ver.
 ```
 
-
-
-# Tvz testar mais alguns tamanhos de janela? 
 
 # Tvz criar um novo script com as coisas daqui para baixo?
 
@@ -199,7 +194,7 @@ CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
 
 ```
 ## OGR data source with driver: ESRI Shapefile 
-## Source: "/cloud/project/data_use", layer: "SP_3509452_APP_USO"
+## Source: "G:\My Drive\UFSCar\Projetos\teste\APPs_ALPA\data_use", layer: "SP_3509452_APP_USO"
 ## with 5 features
 ## It has 6 fields
 ```
@@ -209,12 +204,18 @@ CMA_all@data
 ```
 
 ```
-##   GEOCODIGO               MUNICIPIO UF CD_UF             CLASSE_USO    AREA_HA
-## 0   3509452 CAMPINA DO MONTE ALEGRE SP    35       área antropizada 14063.5000
-## 1   3509452 CAMPINA DO MONTE ALEGRE SP    35         área edificada   106.2360
-## 2   3509452 CAMPINA DO MONTE ALEGRE SP    35     formação florestal  2078.7000
-## 3   3509452 CAMPINA DO MONTE ALEGRE SP    35 formação não florestal    73.8172
-## 4   3509452 CAMPINA DO MONTE ALEGRE SP    35           silvicultura  1925.9400
+##   GEOCODIGO               MUNICIPIO UF CD_UF                CLASSE_USO
+## 0   3509452 CAMPINA DO MONTE ALEGRE SP    35         Ã¡rea antropizada
+## 1   3509452 CAMPINA DO MONTE ALEGRE SP    35           Ã¡rea edificada
+## 2   3509452 CAMPINA DO MONTE ALEGRE SP    35      formaÃ§Ã£o florestal
+## 3   3509452 CAMPINA DO MONTE ALEGRE SP    35 formaÃ§Ã£o nÃ£o florestal
+## 4   3509452 CAMPINA DO MONTE ALEGRE SP    35              silvicultura
+##      AREA_HA
+## 0 14063.5000
+## 1   106.2360
+## 2  2078.7000
+## 3    73.8172
+## 4  1925.9400
 ```
 
 Cálculo APP
