@@ -4,6 +4,8 @@ author: "JCLAraujo"
 date: "28/05/2020"
 output: 
   html_document:
+    includes:
+      after_body: footer.html
     keep_md: True
     toc: True
 ---
