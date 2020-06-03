@@ -122,6 +122,7 @@ st_geometry(a.col.df)<-NULL
 
 #head(a.col.df)
 somatoria<-rowsum(a.col.df$areaHa, group=a.col.df$CLASSE_USO)
+
 ```
 
 ## Resultados quantitativos
@@ -138,4 +139,25 @@ Pequenas diferenças. Pode ser de somatoria e arredondamentos. Seria bom verific
 
 O total de APP a ser restaurado em CMA é de `r somatoria[2,]+somatoria[3,]+somatoria[6,]` ha, o que corresponde a `r 100*((somatoria[2,]+somatoria[3,]+somatoria[6,])/colSums(somatoria))` % do total de APPs do município.
 
+## Resultados para APP de nascente
 
+Separando a área (ha) por tipo de APP
+```{r}
+area_nasc<-rowsum(a.col.df$areaHa, group=a.col.df$HIDRO)
+```
+
+```{r}
+area_nasc
+```
+
+Calculando o uso de solo dentro das APPs de nascente
+```{r}
+a.nasc<-a.col.df[a.col.df$HIDRO=="nascente",]
+somatoria_nasc<-rowsum(a.nasc$areaHa, group=a.nasc$CLASSE_USO)
+```
+
+```{r}
+somatoria_nasc
+```
+
+O total de APP, dispostas em nascentes, a ser restaurado em CMA é de `r somatoria_nasc[2,]+somatoria_nasc[5,]` ha, o que corresponde a `r 100*((somatoria_nasc[2,]+somatoria_nasc[5,])/colSums(somatoria_nasc))` % do total de APPs presentes apenas em nascentes do município.
