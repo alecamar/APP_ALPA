@@ -8,7 +8,7 @@ output:
     toc: True
 ---
 
-# Introdução
+# <h3>Introdução</h3>
 
 Nesse script buscamos identificar e quantificar as APPs que necessitam ser restauradas em Campina do Monte Alegre.
 
@@ -155,6 +155,16 @@ Calculando o uso de solo dentro das APPs de nascente
 a.nasc<-a.col.df[a.col.df$HIDRO=="nascente",]
 somatoria_nasc<-rowsum(a.nasc$areaHa, group=a.nasc$CLASSE_USO)
 ```
+
+Plotando as nascentes
+```{r}
+plot.nasc<-a.col[a.col$HIDRO=="nascente",]
+plot(plot.nasc["CLASSE_USO"], border="transparent")
+
+?plot
+
+```
+
 
 ```{r}
 somatoria_nasc

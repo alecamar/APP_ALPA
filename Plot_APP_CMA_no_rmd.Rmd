@@ -53,7 +53,7 @@ cbind(CMA_app@data[,2], CMA_app@data[,5:7])
 
 Plota dados apps
 ```{r, fig.align='center'}
-plot(CMA_app, col = "transparent", border="transparent")
+plot(CMA_app, col = "transparent", border="transparent",)
 
 app_cda_0_10 <- CMA_app@data$HIDRO == "curso d'Ã¡gua (0 - 10m)"
 plot(CMA_app[app_cda_0_10,], col = "dark green", border="transparent", add=TRUE)

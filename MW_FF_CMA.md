@@ -1,6 +1,6 @@
 ---
-title: "MW_APP_CMA"
-author: "JCLAraujo"
+title: "MoveWindow - APP's Campina do Monte Alegre"
+author: "NEEDS"
 date: "28/05/2020"
 output: 
   html_document:
@@ -91,7 +91,10 @@ plot(r07.m15.focal, main="2007, 450m")
 plot(r07.m21.focal, main="2007, 630m")
 ```
 
-<img src="MW_FF_CMA_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+<img src="MW_FF_CMA_files/figure-html/unnamed-chunk-8-1.png" alt=" Figura 1. Situação dos fragmentos (2007) em diferentes tamanhos de janela"  />
+<p class="caption"> Figura 1. Situação dos fragmentos (2007) em diferentes tamanhos de janela</p>
+</div>
 
 Plota o MW para 2017
 
@@ -102,4 +105,7 @@ plot(r17.m15.focal, main="2017, 450m")
 plot(r17.m21.focal, main="2017, 630m")
 ```
 
-<img src="MW_FF_CMA_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+<div class="figure" style="text-align: center">
+<img src="MW_FF_CMA_files/figure-html/unnamed-chunk-9-1.png" alt=" Figura 2. Situação dos fragmentos (2017) em diferentes tamanhos de janela"  />
+<p class="caption"> Figura 2. Situação dos fragmentos (2017) em diferentes tamanhos de janela</p>
+</div>
