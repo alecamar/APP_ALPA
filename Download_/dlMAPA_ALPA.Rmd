@@ -1,0 +1,472 @@
+---
+title: "MUNIC_ALL"
+author: "JCLAraujo & PFFernandes"
+date: "29/05/2020"
+output: 
+  html_document:
+    keep_md: True
+  
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introdução
+Aqui vamos apenas carregar os mapas baixados da semana passada e plota-los no R
+
+# Passos
+Para conseguir usar o comando para a leitura do shapefile será necessário que rgdal esteja instalado e ativo.
+```{r, eval=FALSE}
+install.packages(c('raster', 'sp', 'rgdal', 'dplyr', 'XML', 'curl'))
+```
+
+Load packages
+```{r}
+library(raster)
+library(sp)
+library(rgdal)
+library(dplyr)
+library(XML)
+library(curl)
+```
+
+Script para download dos dados.
+```{r, "Script semana passada corrigido", eval=FALSE}
+dir.create("./data_use")
+
+#BURI
+lista.files.uso.buri = readLines('http://geo.fbds.org.br/SP/BURI/USO/')
+lista.files.app.buri = readLines('http://geo.fbds.org.br/SP/BURI/APP/')
+
+
+#CAPÃO BONITO
+lista.files.uso.capaobonito = readLines('http://geo.fbds.org.br/SP/CAPAO_BONITO/USO/')
+lista.files.app.capaobonito = readLines('http://geo.fbds.org.br/SP/CAPAO_BONITO/APP/')
+
+
+#PARANAPANEMA
+lista.files.uso.paranapanema = readLines('http://geo.fbds.org.br/SP/PARANAPANEMA/USO/')
+lista.files.app.paranapanema = readLines('http://geo.fbds.org.br/SP/PARANAPANEMA/APP/')
+
+
+#ANGATUBA
+lista.files.uso.angatuba = readLines('http://geo.fbds.org.br/SP/ANGATUBA/USO/')
+lista.files.app.angatuba = readLines('http://geo.fbds.org.br/SP/ANGATUBA/APP/')
+
+
+#ITAPETININGA
+lista.files.uso.itapetininga =
+readLines('http://geo.fbds.org.br/SP/ITAPETININGA/USO/')
+lista.files.app.itapetininga =
+readLines('http://geo.fbds.org.br/SP/ITAPETININGA/APP/')
+
+
+#CMA
+lista.files.uso.cma = readLines('http://geo.fbds.org.br/SP/CAMPINA_DO_MONTE_ALEGRE/USO/')
+lista.files.app.cma = readLines('http://geo.fbds.org.br/SP/CAMPINA_DO_MONTE_ALEGRE/APP/')
+
+lks.lista<-c(lista.files.uso.buri,lista.files.app.buri,lista.files.uso.capaobonito,lista.files.app.capaobonito,lista.files.uso.paranapanema,lista.files.app.paranapanema,lista.files.uso.angatuba,lista.files.app.angatuba,lista.files.uso.itapetininga,lista.files.app.itapetininga,lista.files.uso.cma,lista.files.app.cma)
+lks<-getHTMLLinks(lks.lista, xpQuery = "//a/@href[contains(., 'SP')]")
+for (i in 1:(length(lks))){
+  destf<-paste("./data_use", strsplit(lks[i], "/")[[1]][5], sep="/")
+  curl_download((paste("http://geo.fbds.org.br", lks[i], sep="")),destfile = destf)
+}
+
+```
+
+Aqui começamos a carregar os mapas para o R. O comando responsável em carregar o shapefile como SpatialPolygonsDataFrame para dentro do R é o readOGR.
+
+```{r, "Carregando os mapas", cache=TRUE}
+BURI_uso<-readOGR(dsn="./data_use",layer="SP_3508009_USO")
+BURI_app<-readOGR(dsn="./data_use",layer="SP_3508009_APP")
+BURI_all<-readOGR(dsn="./data_use",layer="SP_3508009_APP_USO")
+
+CAPAOBONITO_uso<-readOGR(dsn="./data_use",layer="SP_3510203_USO")
+CAPAOBONITO_app<-readOGR(dsn="./data_use",layer="SP_3510203_APP")
+CAPAOBONITO_all<-readOGR(dsn="./data_use",layer="SP_3510203_APP_USO")
+
+PARANAPANEMA_uso<-readOGR(dsn="./data_use",layer="SP_3535804_USO")
+PARANAPANEMA_app<-readOGR(dsn="./data_use",layer="SP_3535804_APP")
+PARANAPANEMA_all<-readOGR(dsn="./data_use",layer="SP_3535804_APP_USO")
+
+ANGATUBA_uso<-readOGR(dsn="./data_use",layer="SP_3502200_USO")
+ANGATUBA_app<-readOGR(dsn="./data_use",layer="SP_3502200_APP")
+ANGATUBA_all<-readOGR(dsn="./data_use",layer="SP_3502200_APP_USO")
+
+ITAPETININGA_uso<-readOGR(dsn="./data_use",layer="SP_3522307_USO")
+ITAPETININGA_app<-readOGR(dsn="./data_use",layer="SP_3522307_APP")
+ITAPETININGA_all<-readOGR(dsn="./data_use",layer="SP_3522307_APP_USO")
+
+CMA_uso<-readOGR(dsn="./data_use",layer="SP_3509452_USO")
+CMA_app<-readOGR(dsn="./data_use",layer="SP_3509452_APP")
+CMA_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
+```
+
+Nota-se que o "dsn" é o diretório do arquivo, sem o nome do shapefile, que deve ser colocado no "layer" sem a extensão. Isso faz com que todos os arquivos com o mesmo nome sejam carregados, pegando dessa forma todas as informações necessárias.
+
+Para a visualização dos mapas basta usar o comando plot(obj), sendo o "obj" o objeto em que o mapa foi salvo dentro do R
+```{r}
+plot(BURI_all)
+plot(CAPAOBONITO_all)
+plot(PARANAPANEMA_all)
+plot(ANGATUBA_all)
+plot(ITAPETININGA_all)
+plot(CMA_all)
+```
+
+Plotando o uso do solo
+```{r, "BURI_uso", echo=TRUE, fig.align='center', fig.cap="Uso e cobertura do solo de BURI"}
+plot(BURI_uso, col = "transparent", border="transparent")
+
+flo <- BURI_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(BURI_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- BURI_uso@data$CLASSE_USO == "Ã¡rea edificada"
+plot(BURI_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- BURI_uso@data$CLASSE_USO == "silvicultura"
+plot(BURI_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- BURI_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(BURI_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- BURI_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(BURI_uso[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "CAPAOBONITO_uso", echo=TRUE, fig.align='center', fig.cap="Uso e cobertura do solo de CAPAOBONITO"}
+plot(CAPAOBONITO_uso, col = "transparent", border="transparent")
+
+flo <- CAPAOBONITO_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(CAPAOBONITO_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- CAPAOBONITO_uso@data$CLASSE_USO == "Ã¡rea edificada"
+plot(CAPAOBONITO_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- CAPAOBONITO_uso@data$CLASSE_USO == "silvicultura"
+plot(CAPAOBONITO_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- CAPAOBONITO_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(CAPAOBONITO_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- CAPAOBONITO_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(CAPAOBONITO_uso[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "PARANAPANEMA_uso", echo=TRUE, fig.align='center', fig.cap="Uso e cobertura do solo de PARANAPANEMA"}
+plot(PARANAPANEMA_uso, col = "transparent", border="transparent")
+
+flo <- PARANAPANEMA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(PARANAPANEMA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- PARANAPANEMA_uso@data$CLASSE_USO == "Ã¡rea edificada"
+plot(PARANAPANEMA_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- PARANAPANEMA_uso@data$CLASSE_USO == "silvicultura"
+plot(PARANAPANEMA_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- PARANAPANEMA_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(PARANAPANEMA_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- PARANAPANEMA_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(PARANAPANEMA_uso[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "ANGATUBA_uso", echo=TRUE, fig.align='center', fig.cap="Uso e cobertura do solo de ANGATUBA"}
+plot(ANGATUBA_uso, col = "transparent", border="transparent")
+
+flo <- ANGATUBA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(ANGATUBA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- ANGATUBA_uso@data$CLASSE_USO == "Ã¡rea edificada"
+plot(ANGATUBA_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- ANGATUBA_uso@data$CLASSE_USO == "silvicultura"
+plot(ANGATUBA_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- ANGATUBA_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(ANGATUBA_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- ANGATUBA_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(ANGATUBA_uso[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "ITAPETININGA_uso", echo=TRUE, fig.align='center', fig.cap="Uso e cobertura do solo de ITAPETININGA"}
+plot(ITAPETININGA_uso, col = "transparent", border="transparent")
+
+flo <- ITAPETININGA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(ITAPETININGA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- ITAPETININGA_uso@data$CLASSE_USO == "Ã¡rea edificada"
+plot(ITAPETININGA_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- ITAPETININGA_uso@data$CLASSE_USO == "silvicultura"
+plot(ITAPETININGA_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- ITAPETININGA_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(ITAPETININGA_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- ITAPETININGA_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(ITAPETININGA_uso[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+
+```{r, "CMA_uso", echo=TRUE, fig.align='center', fig.cap="Uso e cobertura do solo de CMA"}
+plot(CMA_uso, col = "transparent", border="transparent")
+
+flo <- CMA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(CMA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- CMA_uso@data$CLASSE_USO == "Ã¡rea edificada"
+plot(CMA_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- CMA_uso@data$CLASSE_USO == "silvicultura"
+plot(CMA_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- CMA_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(CMA_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- CMA_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(CMA_uso[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+```{r, "BURI_floresta", echo=TRUE, fig.align='center', fig.cap="Florestas de BURI"}
+
+plot(BURI_uso, col = "transparent", border="transparent")
+
+flo <- BURI_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(BURI_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+legend("topright", "Floresta", fill="dark green")
+```
+
+```{r, "CAPAOBONITO_floresta", echo=TRUE, fig.align='center', fig.cap="Florestas de CAPAOBONITO"}
+
+plot(CAPAOBONITO_uso, col = "transparent", border="transparent")
+
+flo <- CAPAOBONITO_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(CAPAOBONITO_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+legend("topright", "Floresta", fill="dark green")
+```
+
+```{r, "PARANAPANEMA_floresta", echo=TRUE, fig.align='center', fig.cap="Florestas de PARANAPANEMA"}
+
+plot(PARANAPANEMA_uso, col = "transparent", border="transparent")
+
+flo <- PARANAPANEMA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(PARANAPANEMA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+legend("topright", "Floresta", fill="dark green")
+```
+
+```{r, "ANGATUBA_floresta", echo=TRUE, fig.align='center', fig.cap="Florestas de ANGATUBA"}
+
+plot(ANGATUBA_uso, col = "transparent", border="transparent")
+
+flo <- ANGATUBA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(ANGATUBA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+legend("topright", "Floresta", fill="dark green")
+```
+
+```{r, "ITAPETININGA_floresta", echo=TRUE, fig.align='center', fig.cap="Florestas de ITAPETININGA"}
+
+plot(ITAPETININGA_uso, col = "transparent", border="transparent")
+
+flo <- ITAPETININGA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(ITAPETININGA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+legend("topright", "Floresta", fill="dark green")
+```
+
+```{r, "CMA_floresta", echo=TRUE, fig.align='center', fig.cap="Florestas de CMA"}
+
+plot(CMA_uso, col = "transparent", border="transparent")
+
+flo <- CMA_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(CMA_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+legend("topright", "Floresta", fill="dark green")
+```
+```{r, "uso apps BURI", fig.align="center", fig.cap="Uso e cobertura APPs BURI"}
+plot(BURI_all, col = "transparent", border="transparent")
+
+flo <- BURI_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(BURI_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- BURI_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(BURI_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- BURI_all@data$CLASSE_USO == "silvicultura"
+plot(BURI_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- BURI_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(BURI_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- BURI_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(BURI_all[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "uso apps CAPAOBONITO", fig.align="center", fig.cap="Uso e cobertura APPs CAPAOBONITO"}
+plot(CAPAOBONITO_all, col = "transparent", border="transparent")
+
+flo <- CAPAOBONITO_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(CAPAOBONITO_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- CAPAOBONITO_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(CAPAOBONITO_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- CAPAOBONITO_all@data$CLASSE_USO == "silvicultura"
+plot(CAPAOBONITO_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- CAPAOBONITO_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(CAPAOBONITO_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- CAPAOBONITO_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(CAPAOBONITO_all[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "uso apps PARANAPANEMA", fig.align="center", fig.cap="Uso e cobertura APPs PARANAPANEMA"}
+plot(PARANAPANEMA_all, col = "transparent", border="transparent")
+
+flo <- PARANAPANEMA_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(PARANAPANEMA_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- PARANAPANEMA_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(PARANAPANEMA_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- PARANAPANEMA_all@data$CLASSE_USO == "silvicultura"
+plot(PARANAPANEMA_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- PARANAPANEMA_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(PARANAPANEMA_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- PARANAPANEMA_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(PARANAPANEMA_all[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "uso apps ANGATUBA", fig.align="center", fig.cap="Uso e cobertura APPs ANGATUBA"}
+plot(ANGATUBA_all, col = "transparent", border="transparent")
+
+flo <- ANGATUBA_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(ANGATUBA_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- ANGATUBA_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(ANGATUBA_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- ANGATUBA_all@data$CLASSE_USO == "silvicultura"
+plot(ANGATUBA_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- ANGATUBA_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(ANGATUBA_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- ANGATUBA_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(ANGATUBA_all[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "uso apps ITAPETININGA", fig.align="center", fig.cap="Uso e cobertura APPs ITAPETININGA"}
+plot(ITAPETININGA_all, col = "transparent", border="transparent")
+
+flo <- ITAPETININGA_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(ITAPETININGA_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- ITAPETININGA_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(ITAPETININGA_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- ITAPETININGA_all@data$CLASSE_USO == "silvicultura"
+plot(ITAPETININGA_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- ITAPETININGA_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(ITAPETININGA_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- ITAPETININGA_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(ITAPETININGA_all[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+ 
+```{r, "uso apps CMA", fig.align="center", fig.cap="Uso e cobertura APPs CMA"}
+plot(CMA_all, col = "transparent", border="transparent")
+
+flo <- CMA_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(CMA_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- CMA_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(CMA_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- CMA_all@data$CLASSE_USO == "silvicultura"
+plot(CMA_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- CMA_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(CMA_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- CMA_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(CMA_all[ant,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+
+```{r, fig.align="center"}
+plot(BURI_all)
+plot(CAPAOBONITO_all)
+plot(PARANAPANEMA_all)
+plot(ANGATUBA_all)
+plot(ITAPETININGA_all)
+plot(CMA_all)
+```
+
+Tipos de APPs
+```{r}
+cbind(BURI_app@data[,2], BURI_app@data[,5:7])
+cbind(CAPAOBONITO_app@data[,2], CAPAOBONITO_app@data[,5:7])
+cbind(PARANAPANEMA_app@data[,2], PARANAPANEMA_app@data[,5:7])
+cbind(ANGATUBA_app@data[,2], ANGATUBA_app@data[,5:7])
+cbind(ITAPETININGA_app@data[,2], ITAPETININGA_app@data[,5:7])
+cbind(CMA_app@data[,2], CMA_app@data[,5:7])
+```
+

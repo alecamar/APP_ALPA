@@ -1,0 +1,192 @@
+---
+title: "APPs de Campina do Monte Alegre"
+author: "NEEDS"
+date: "05/2020"
+output: 
+  html_document:
+    fig_retina: null 
+    includes:
+      after_body: footer.html
+    keep_md: True
+    toc: True
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r, echo=FALSE}
+inline_hook <- function(x) {
+  if (is.numeric(x)) {
+    format(x, digits = 2)
+  } else x
+}
+knitr::knit_hooks$set(inline = inline_hook)
+```
+
+
+```{r, "instala os pacotes", echo=FALSE}
+list.of.packages <- c("rgdal", "sf", "raster", "rgeos")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+```{r, "executa os pacotes", message=FALSE, warning=FALSE, echo=FALSE}
+require(raster)
+require(rgdal)
+require(rgeos)
+```
+
+```{r, "carrega os mapas", echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+Mun_app<-readOGR(dsn="./data_use",layer="SP_3509452_APP")
+Mun_uso<-readOGR(dsn="./data_use",layer="SP_3509452_USO")
+Mun_all<-readOGR(dsn="./data_use",layer="SP_3509452_APP_USO")
+```
+
+```{r, "Nome do município que está sendo trabalhado", echo=FALSE}
+Nome_Mun<-"Campina do Monte Alegre"
+```
+
+# Introdução
+
+
+# Distribuição das APPs e Uso 
+### Uso do solo
+
+  O município de `r Nome_Mun` possui área total de `r gArea(Mun_uso)/10000`Ha, distribuidos em seis classes de uso que podem ser observadas na tabela abaixo, com suas respectivas áreas totais.
+```{r, "Cria a tabela de classe de uso", echo=FALSE}
+tab<-Mun_uso@data[,5:6]
+
+knitr::kable(tab, col.names=c("Classe de uso", "Área (Ha)"))
+
+```
+
+```{r}
+attach(mtcars)
+layout(matrix(c(1,1,2,3),2,2, byrow=TRUE))
+x11()
+plot(Mun_uso, col = "transparent", border="black", ylim=c(7385000, 7390000), xlim=c(760000, 770000))
+axis(1)
+axis(2)
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
+plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- Mun_uso@data$CLASSE_USO == "área edificada"
+plot(Mun_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- Mun_uso@data$CLASSE_USO == "silvicultura"
+plot(Mun_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- Mun_uso@data$CLASSE_USO == "área antropizada"
+plot(Mun_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- Mun_uso@data$CLASSE_USO == "formação não florestal"
+plot(Mun_uso[nfl,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+hist(mpg)
+hist(disp)
+
+#dev.new(width = 100, height = 500, unit = "px", noRStudioGD = TRUE)
+#x11(width=4, height=6)
+#plot(Mun_uso, col = "transparent", border="black", ylim=c(7385000, 7390000), xlim=c(760000, 770000))
+#axis(1)
+#axis(2)
+#dev.off()
+
+```
+
+
+```{r, "Uso de solo do Município", echo=FALSE, fig.align='center', fig.width=8, fig.height=4, fig.cap="Uso e cobertura do solo de CMA"}
+plot(Mun_uso, col = "transparent", border="transparent")
+
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
+plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- Mun_uso@data$CLASSE_USO == "área edificada"
+plot(Mun_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- Mun_uso@data$CLASSE_USO == "silvicultura"
+plot(Mun_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- Mun_uso@data$CLASSE_USO == "área antropizada"
+plot(Mun_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- Mun_uso@data$CLASSE_USO == "formação não florestal"
+plot(Mun_uso[nfl,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+axis(1)
+axis(2)
+```
+
+```{r, "CMA_floresta", echo=FALSE, fig.align='center', fig.cap="Florestas de CMA"}
+
+plot(Mun_uso, col = "transparent", border="transparent")
+
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
+plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+plot(Mun_app, col="black", border="transparent", add=TRUE)
+axis(1)
+axis(2)
+
+```
+
+```{r, "uso apps CMA", echo=FALSE, fig.align="center", fig.cap="Uso e cobertura APPs CMA"}
+plot(Mun_all, col = "transparent", border="transparent")
+
+flo <- Mun_all@data$CLASSE_USO == "formação florestal"
+plot(Mun_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- Mun_all@data$CLASSE_USO == "área edificada"
+plot(Mun_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- Mun_all@data$CLASSE_USO == "silvicultura"
+plot(Mun_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- Mun_all@data$CLASSE_USO == "área antropizada"
+plot(Mun_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- Mun_all@data$CLASSE_USO == "formação não florestal"
+plot(Mun_all[nfl,], col = "yellow", border="transparent", add=TRUE)
+
+legend("topright", c("Floresta", "Formação não florestal","Silvicultura",
+                     "Edificacoes","Area Antropizada"), fill=c("dark green",
+                     "yellow", "purple", "red", "orange"), cex=0.8)
+axis(1)
+axis(2)
+?xlim
+```
+
+```{r, echo=FALSE, fig.align='center', fig.width=8, fig.height=4, fig.cap=""}
+plot(Mun_app, col = "transparent", border="transparent",)
+
+app_cda_0_10 <- Mun_app@data$HIDRO == "curso d'água (0 - 10m)"
+plot(Mun_app[app_cda_0_10,], col = "dark green", border="transparent", add=TRUE)
+
+app_cda_10_50<- Mun_app@data$HIDRO == "curso d'água (10 - 50m)"
+plot(Mun_app[app_cda_10_50,], col = "yellow", border="transparent", add=TRUE)
+
+app_cda_50_200<- Mun_app@data$HIDRO == "curso d'água (50 - 200m)"
+plot(Mun_app[app_cda_50_200,], col = "purple", border="transparent", add=TRUE)
+
+mda<- Mun_app@data$HIDRO == "massa d'água"
+plot(Mun_app[mda,], col = "blue", border="transparent", add=TRUE)
+
+app_nascente<- Mun_app@data$HIDRO == "nascente"
+plot(Mun_app[app_nascente,], col = "red", border="transparent", add=TRUE)
+
+legend("topright", c("APP curso d'água 0-10m", "APP curso d'água 10-50m", 
+                     "APP curso d'água 50-200m", "APP nascentes", "Massa d'água"),
+                     fill=c("dark green", "yellow", "purple", "red", "orange"), 
+                     cex = 0.8)
+axis(1)
+axis(2)
+```
+
+
+
