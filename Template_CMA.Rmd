@@ -56,20 +56,17 @@ Nome_Mun<-"Campina do Monte Alegre"
 ### Uso do solo
 
   O município de `r Nome_Mun` possui área total de `r gArea(Mun_uso)/10000`Ha, distribuidos em seis classes de uso que podem ser observadas na tabela abaixo, com suas respectivas áreas totais.
-```{r, "Cria a tabela de classe de uso", echo=FALSE}
+```{r, "Cria a tabela de classe de uso", echo=FALSE, fig.align='center'}
 tab<-Mun_uso@data[,5:6]
 
 knitr::kable(tab, col.names=c("Classe de uso", "Área (Ha)"))
 
 ```
 
-```{r}
+```{r echo=FALSE, fig.align='center', fig.width=8, fig.height=4}
 attach(mtcars)
 layout(matrix(c(1,1,2,3),2,2, byrow=TRUE))
-x11()
-plot(Mun_uso, col = "transparent", border="black", ylim=c(7385000, 7390000), xlim=c(760000, 770000))
-axis(1)
-axis(2)
+plot(Mun_uso, col = "transparent", border="black", xlim=c(750000, 770000))
 flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
 plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
 
@@ -85,41 +82,74 @@ plot(Mun_uso[ant,], col = "orange", border="transparent", add=TRUE)
 nfl<- Mun_uso@data$CLASSE_USO == "formação não florestal"
 plot(Mun_uso[nfl,], col = "yellow", border="transparent", add=TRUE)
 
-legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"),
+       fill=c("dark green", "yellow", "purple", "red", "orange"))
 axis(1)
 axis(2)
 hist(mpg)
 hist(disp)
 
-#dev.new(width = 100, height = 500, unit = "px", noRStudioGD = TRUE)
-#x11(width=4, height=6)
-#plot(Mun_uso, col = "transparent", border="black", ylim=c(7385000, 7390000), xlim=c(760000, 770000))
-#axis(1)
-#axis(2)
-#dev.off()
+dev.new(width = 100, height = 500, unit = "px", noRStudioGD = TRUE)
+x11(width=4, height=6)
+plot(Mun_uso, col = "transparent", border="black", ylim=c(7385000, 7390000), xlim=c(760000, 770000))
+axis(1)
+axis(2)
+dev.off()
 
 ```
 
 
-```{r, "Uso de solo do Município", echo=FALSE, fig.align='center', fig.width=8, fig.height=4, fig.cap="Uso e cobertura do solo de CMA"}
-plot(Mun_uso, col = "transparent", border="transparent")
+```{r, "Uso de solo do Município", echo=FALSE, fig.align='center', fig.width=12, fig.height=9, fig.cap="Uso e cobertura do solo de CMA"}
+?par
+par(mfrow=c(1,2) )
+plot(Mun_uso, col = "transparent", border="transparent", ylim=c(7375000, 7400000), xlim=c(750000, 770000) )
 
-flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
+flo <- Mun_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
 plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
 
-urb<- Mun_uso@data$CLASSE_USO == "área edificada"
+urb<- Mun_uso@data$CLASSE_USO == "Ã¡rea edificada"
 plot(Mun_uso[urb,], col = "red", border="transparent", add=TRUE)
 
 sil<- Mun_uso@data$CLASSE_USO == "silvicultura"
 plot(Mun_uso[sil,], col = "purple", border="transparent", add=TRUE)
 
-ant<- Mun_uso@data$CLASSE_USO == "área antropizada"
+ant<- Mun_uso@data$CLASSE_USO == "Ã¡rea antropizada"
 plot(Mun_uso[ant,], col = "orange", border="transparent", add=TRUE)
 
-nfl<- Mun_uso@data$CLASSE_USO == "formação não florestal"
+nfl<- Mun_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
 plot(Mun_uso[nfl,], col = "yellow", border="transparent", add=TRUE)
 
-legend("topright", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes", "Area Antropizada"), fill=c("dark green", "yellow", "purple", "red", "orange"))
+mag<- Mun_uso@data$CLASSE_USO == "Ã¡gua"
+plot(Mun_uso[mag,], col = "blue", border="transparent", add=TRUE)
+
+legend("bottomleft", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes",
+                       "Area Antropizada", "Massa d'água"), fill=c("dark green","yellow",
+                       "purple", "red", "orange", "blue"), cex=0.8)
+axis(1)
+axis(2)
+
+##############################################################################################################################################
+
+plot(Mun_all, col = "transparent", border="transparent", ylim=c(7375000, 7400000), xlim=c(750000, 770000))
+
+flo <- Mun_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+plot(Mun_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- Mun_all@data$CLASSE_USO == "Ã¡rea edificada"
+plot(Mun_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- Mun_all@data$CLASSE_USO == "silvicultura"
+plot(Mun_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- Mun_all@data$CLASSE_USO == "Ã¡rea antropizada"
+plot(Mun_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- Mun_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+plot(Mun_all[nfl,], col = "yellow", border="transparent", add=TRUE)
+
+legend("bottomleft", c("Floresta", "Formação não florestal","Silvicultura",
+                     "Edificacoes","Area Antropizada"), fill=c("dark green",
+                     "yellow", "purple", "red", "orange"), cex=0.8)
 axis(1)
 axis(2)
 ```
@@ -134,35 +164,8 @@ plot(Mun_app, col="black", border="transparent", add=TRUE)
 axis(1)
 axis(2)
 
-```
+#################################################################################################################################################
 
-```{r, "uso apps CMA", echo=FALSE, fig.align="center", fig.cap="Uso e cobertura APPs CMA"}
-plot(Mun_all, col = "transparent", border="transparent")
-
-flo <- Mun_all@data$CLASSE_USO == "formação florestal"
-plot(Mun_all[flo,], col = "dark green", border="transparent", add=TRUE)
-
-urb<- Mun_all@data$CLASSE_USO == "área edificada"
-plot(Mun_all[urb,], col = "red", border="transparent", add=TRUE)
-
-sil<- Mun_all@data$CLASSE_USO == "silvicultura"
-plot(Mun_all[sil,], col = "purple", border="transparent", add=TRUE)
-
-ant<- Mun_all@data$CLASSE_USO == "área antropizada"
-plot(Mun_all[ant,], col = "orange", border="transparent", add=TRUE)
-
-nfl<- Mun_all@data$CLASSE_USO == "formação não florestal"
-plot(Mun_all[nfl,], col = "yellow", border="transparent", add=TRUE)
-
-legend("topright", c("Floresta", "Formação não florestal","Silvicultura",
-                     "Edificacoes","Area Antropizada"), fill=c("dark green",
-                     "yellow", "purple", "red", "orange"), cex=0.8)
-axis(1)
-axis(2)
-?xlim
-```
-
-```{r, echo=FALSE, fig.align='center', fig.width=8, fig.height=4, fig.cap=""}
 plot(Mun_app, col = "transparent", border="transparent",)
 
 app_cda_0_10 <- Mun_app@data$HIDRO == "curso d'água (0 - 10m)"
