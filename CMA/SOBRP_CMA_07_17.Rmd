@@ -1,0 +1,100 @@
+---
+title: "Sobreposição de raster CMA"
+author: "NEEDS"
+date: "28/05/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Introdução:
+Nesse script buscamos sobrepor dois mapas raster de Campina do Monte Alegre, dos anos de 2007 e 2017.
+
+Nosso objetivo com essa análise é verificar onde ocorreu perdas e ganhos de Vegetação Nativa e onde ela se manteve entre os anos de 2007 e 2017.
+
+#### Pacotes utilizados:
+##### - raster = Para manipulação dos rasters dentro do R
+##### - fields = Pacote de paletas de cores
+
+#### Instalando e carregando os pacotes necessários:
+```{r}
+#Pacotes necessarios
+list.of.packages <- c("raster", "fields")
+
+#Comando para checar se existem os pacotes baixados em seu Pc, caso não tenha, eles seram baixados e instalados automaticamente
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+```{r carrega pacotes necessarios, message=FALSE}
+require(raster)
+require(fields)
+```
+
+#### Carregando os mapas em formato raster que utilizaremos:
+```{r}
+r07<-raster("../data_use/raster/RASTER_CMA_07.tif")
+r17<-raster("../data_use/raster/RASTER_CMA_017.tif")
+```
+
+#### Plotando os rasters:
+```{r}
+par(mfrow=c(1,2))
+plot(r07)
+plot(r17)
+```
+
+## Agora começamos a sobreposição de rasters:
+
+#### Aqui iremos reclassificar o raster de 2007, para transformar a vegetação nativa (value3) em 1 e todo o resto em 0:
+```{r}
+# Tudo menor que 3(< 3) vira(é atribuido) 0 (<- 0)
+r07[r07 < 3] <- 0
+# Tudo maior que 3(> 3) vira(é atribuido) 0 (<- 0)
+r07[r07 > 3] <- 0
+# Tudo igual a 3(== 3) vira(é atribuido) 2 (<- 2)
+r07[r07 == 3] <- 1
+```
+
+#### Depois reclassificamos o raster de 2017, para transformar a vegetação nativa (value3) em 2 e todo o resto em 0:
+```{r}
+r17[r17 < 3] <- 0
+r17[r17 > 3] <- 0
+r17[r17 == 3] <- 2
+```
+
+#### Plotando os rasters reclassificados:
+```{r}
+par(mfrow=c(1,2))
+plot(r07)
+plot(r17)
+```
+
+#### Agora plotamos o mapa de 2007 sobre o mapa de 2017, para ver os ganhos e perdas de Vegetação nativa:
+##### Quando utilizamos esse comando, os values são somados, ou seja:
+##### - onde existia Vegetação Nativa tanto em 2007(values 1) como em 2017(values2), sera atribuido values 3(2+1)
+##### - onde só apresentava Vegetação Nativa em 2007, continuara com values 1
+##### - e onde só apresentou Vegetação Nativa em 2017, continuara com values 2.
+```{r}
+r_ganhos_perdas<-plot(r07+r17)
+```
+
+## Agora alteramos as cores do mapa:
+
+#### Criar paletas de cores:
+```{r}
+col_uso<-colorRampPalette(c("white","red","blue","green"))
+col_uso(4)
+```
+
+#### Plotando com o plot normal e legendas:
+```{r, echo=TRUE, fig.align='center',fig.width=6,fig.height=6}
+plot(r07+r17, legend = FALSE,main="Veg. Nativa de CMA entre os anos de 2007 e 2017",col=col_uso(4))
+legend("bottomleft", c("Manteve", "Perdas", "Ganhos", "N existente"), fill=c("green", "red", "blue", "white"))
+```
+
+
+
