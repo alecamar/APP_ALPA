@@ -79,8 +79,6 @@ somatoria<-rowsum(a.col.df$areaHa, group=a.col.df$CLASSE_USO)
 somatoria_APP<-rowsum(a.col.df$areaHa, group=a.col.df$HIDRO)
 
 ```
-# Introdução
-
 
 # Distribuição das APPs e Uso 
 ### Uso do solo
@@ -98,27 +96,27 @@ knitr::kable(tab, col.names=c("Classe de uso", "Área (Ha)"))
 par(mfrow=c(1,2) )
 plot(Mun_uso, col = "transparent", border="transparent", ylim=c(7375000, 7400000), xlim=c(750000, 770000) )
 
-flo <- Mun_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
 plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
 
-urb<- Mun_uso@data$CLASSE_USO == "Ã¡rea edificada"
+urb<- Mun_uso@data$CLASSE_USO == "área edificada"
 plot(Mun_uso[urb,], col = "red", border="transparent", add=TRUE)
 
 sil<- Mun_uso@data$CLASSE_USO == "silvicultura"
 plot(Mun_uso[sil,], col = "purple", border="transparent", add=TRUE)
 
-ant<- Mun_uso@data$CLASSE_USO == "Ã¡rea antropizada"
+ant<- Mun_uso@data$CLASSE_USO == "área antropizada"
 plot(Mun_uso[ant,], col = "orange", border="transparent", add=TRUE)
 
-nfl<- Mun_uso@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+nfl<- Mun_uso@data$CLASSE_USO == "formação não florestal"
 plot(Mun_uso[nfl,], col = "yellow", border="transparent", add=TRUE)
 
-mag<- Mun_uso@data$CLASSE_USO == "Ã¡gua"
+mag<- Mun_uso@data$CLASSE_USO == "água"
 plot(Mun_uso[mag,], col = "blue", border="transparent", add=TRUE)
 
-legend("bottomleft", c("Floresta", "Formação n Flor", "Silvicultura", "Edificacoes",
-                       "Area Antropizada", "Massa d'água"), fill=c("dark green","yellow",
-                       "purple", "red", "orange", "blue"), cex=0.8)
+legend("bottomleft", c("Floresta", "Formação não florestal", "Silvicultura", "Edificacoes", "Area Antropizada", "Massa d'água"), fill=c("dark green","yellow",
+"purple", "red", "orange", "blue"), cex=0.85)
+
 axis(1)
 axis(2)
 
@@ -126,24 +124,24 @@ axis(2)
 
 plot(Mun_all, col = "transparent", border="transparent", ylim=c(7375000, 7400000), xlim=c(750000, 770000))
 
-flo <- Mun_all@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+flo <- Mun_all@data$CLASSE_USO == "formação florestal"
 plot(Mun_all[flo,], col = "dark green", border="transparent", add=TRUE)
 
-urb<- Mun_all@data$CLASSE_USO == "Ã¡rea edificada"
+urb<- Mun_all@data$CLASSE_USO == "área edificada"
 plot(Mun_all[urb,], col = "red", border="transparent", add=TRUE)
 
 sil<- Mun_all@data$CLASSE_USO == "silvicultura"
 plot(Mun_all[sil,], col = "purple", border="transparent", add=TRUE)
 
-ant<- Mun_all@data$CLASSE_USO == "Ã¡rea antropizada"
+ant<- Mun_all@data$CLASSE_USO == "área antropizada"
 plot(Mun_all[ant,], col = "orange", border="transparent", add=TRUE)
 
-nfl<- Mun_all@data$CLASSE_USO == "formaÃ§Ã£o nÃ£o florestal"
+nfl<- Mun_all@data$CLASSE_USO == "formação não florestal"
 plot(Mun_all[nfl,], col = "yellow", border="transparent", add=TRUE)
 
 legend("bottomleft", c("Floresta", "Formação não florestal","Silvicultura",
                      "Edificacoes","Area Antropizada"), fill=c("dark green",
-                     "yellow", "purple", "red", "orange"), cex=0.8)
+                     "yellow", "purple", "red", "orange"), cex=0.85)
 axis(1)
 axis(2)
 ```
@@ -156,7 +154,7 @@ par(mfrow=c(1,2) )
 
 plot(Mun_uso, col = "transparent", border="transparent", ylim=c(7375000, 7400000), xlim=c(750000, 770000))
 
-flo <- Mun_uso@data$CLASSE_USO == "formaÃ§Ã£o florestal"
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
 plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
 plot(Mun_app, col="black", border="transparent", add=TRUE)
 
@@ -169,16 +167,16 @@ axis(2)
 
 plot(Mun_app, col = "transparent", border="transparent", ylim=c(7375000, 7400000), xlim=c(750000, 770000))
 
-app_cda_0_10 <- Mun_app@data$HIDRO == "curso d'Ã¡gua (0 - 10m)"
+app_cda_0_10 <- Mun_app@data$HIDRO == "curso d'água (0 - 10m)"
 plot(Mun_app[app_cda_0_10,], col = "dark green", border="transparent", add=TRUE)
 
-app_cda_10_50<- Mun_app@data$HIDRO == "curso d'Ã¡gua (10 - 50m)"
+app_cda_10_50<- Mun_app@data$HIDRO == "curso d'água (10 - 50m)"
 plot(Mun_app[app_cda_10_50,], col = "yellow", border="transparent", add=TRUE)
 
-app_cda_50_200<- Mun_app@data$HIDRO == "curso d'Ã¡gua (50 - 200m)"
+app_cda_50_200<- Mun_app@data$HIDRO == "curso d'água (50 - 200m)"
 plot(Mun_app[app_cda_50_200,], col = "purple", border="transparent", add=TRUE)
 
-mda<- Mun_app@data$HIDRO == "massa d'Ã¡gua"
+mda<- Mun_app@data$HIDRO == "massa d'água"
 plot(Mun_app[mda,], col = "blue", border="transparent", add=TRUE)
 
 app_nascente<- Mun_app@data$HIDRO == "nascente"
@@ -214,13 +212,13 @@ knitr::kable(t(somatoria))
 a.nasc<-a.col.df[a.col.df$HIDRO=="nascente",]
 soma_nasc<-rowsum(a.nasc$areaHa, group=a.nasc$CLASSE_USO)
 
-a.cda_10<-a.col.df[a.col.df$HIDRO=="curso d'Ã¡gua (0 - 10m)",]
+a.cda_10<-a.col.df[a.col.df$HIDRO=="curso d'água (0 - 10m)",]
 soma_cda_10<-rowsum(a.cda_10$areaHa, group=a.cda_10$CLASSE_USO)
 
-a.cda_50<-a.col.df[a.col.df$HIDRO=="curso d'Ã¡gua (10 - 50m)",]
+a.cda_50<-a.col.df[a.col.df$HIDRO=="curso d'água (10 - 50m)",]
 soma_cda_50<-rowsum(a.cda_50$areaHa, group=a.cda_50$CLASSE_USO)
 
-a.cda_200<-a.col.df[a.col.df$HIDRO=="curso d'Ã¡gua (50 - 200m)",]
+a.cda_200<-a.col.df[a.col.df$HIDRO=="curso d'água (50 - 200m)",]
 soma_cda_200<-rowsum(a.cda_200$areaHa, group=a.cda_200$CLASSE_USO)
 
 ```
@@ -256,17 +254,19 @@ knitr::kable(t(mun_cda_200))
   
   * Nascente: O total de APP, dispostas em nascentes, a ser restaurado em `r Nome_Mun` é de `r soma_nasc[2,]+soma_nasc[5,]` ha, o que corresponde a `r 100*((soma_nasc[2,]+soma_nasc[5,])/colSums(soma_nasc))` % do total de APPs presentes apenas em nascentes do município.
   
-  * Corpos d'água 0 - 10m: O total de APP, dispostas em corpos d'água 0 - 10m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_10[2,]+soma_cda_10[3,]+soma_cda_10[6,]` ha, o que corresponde a `r 100*(soma_cda_10[2,]+soma_cda_10[3,]+soma_cda_10[6,]/colSums(soma_cda_10))` % do total de APPs presentes apenas em corpos d'água 0 - 10m do município.
+  * Corpos d'água 0 - 10m: O total de APP, dispostas em corpos d'água 0 - 10m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_10[2,]+soma_cda_10[3,]+soma_cda_10[6,]` ha, o que corresponde a `r 100*((soma_cda_10[2,]+soma_cda_10[3,]+soma_cda_10[6,])/colSums(soma_cda_10))` % do total de APPs presentes apenas em corpos d'água 0 - 10m do município.
 
-  * Corpos d'água 10 - 50m: O total de APP, dispostas em corpos d'água 10 - 50m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_50[2,]+soma_cda_50[5,]` ha, o que corresponde a `r 100*(soma_cda_50[2,]+soma_cda_50[5,]/colSums(soma_cda_50))` % do total de APPs presentes apenas em corpos d'água 10 - 50m do município.
+  * Corpos d'água 10 - 50m: O total de APP, dispostas em corpos d'água 10 - 50m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_50[2,]+soma_cda_50[5,]` ha, o que corresponde a `r 100*((soma_cda_50[2,]+soma_cda_50[5,])/colSums(soma_cda_50))` % do total de APPs presentes apenas em corpos d'água 10 - 50m do município.
 
-  * Corpos d'água 50 - 200m: O total de APP, dispostas em corpos d'água 50 - 200m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_200[2,]+soma_cda_200[4,]` ha, o que corresponde a `r 100*(soma_cda_200[2,]+soma_cda_200[4,]/colSums(soma_cda_200))` % do total de APPs presentes apenas em corpos d'água 50 - 200m do município.
+  * Corpos d'água 50 - 200m: O total de APP, dispostas em corpos d'água 50 - 200m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_200[2,]+soma_cda_200[4,]` ha, o que corresponde a `r 100*((soma_cda_200[2,]+soma_cda_200[4,])/colSums(soma_cda_200))` % do total de APPs presentes apenas em corpos d'água 50 - 200m do município.
   
-### Transição florestal
+### Perda/Recuperação florestal
 
-```{r, "carrega e classica os raster", echo=FALSE, warning=FALSE, results='hide'}
-r07<-raster("../data_use/raster/RASTER_CMA_07.tif")
-r17<-raster("../data_use/raster/RASTER_CMA_017.tif")
+Outro ponto importante é saber como funciona o padrão de perda e recuperação de áreas florestais, aqui é mostrada essa dinâmica em 10 anos, entre o período de 2007 e 2017.  
+A Figura 3 ajuda a identificar regiões que talvez precisem de atenção pela crescente perda de vegetação dentro das APPs e também regiões favoráveis para a execução de projetos de recuperação e conservação. 
+```{r, "carrega e classifica os raster", echo=FALSE, warning=FALSE, results='hide'}
+r07<-raster("./data_use/raster/RASTER_CMA_07.tif")
+r17<-raster("./data_use/raster/RASTER_CMA_017.tif")
 
 # Tudo menor que 3(< 3) vira(é atribuido) 0 (<- 0)
 r07[r07 < 3] <- 0
@@ -278,24 +278,14 @@ r07[r07 == 3] <- 1
 r17[r17 < 3] <- 0
 r17[r17 > 3] <- 0
 r17[r17 == 3] <- 2
-```
 
-```{r}
-par(mfrow=c(1,2))
-plot(r07)
-plot(r17)
-```
+#r_ganhos_perdas<-plot(r07+r17)
 
-```{r}
-r_ganhos_perdas<-plot(r07+r17)
-```
-
-```{r}
 col_uso<-colorRampPalette(c("white","red","blue","green"))
 col_uso(4)
 ```
 
-```{r, echo=TRUE, fig.align='center',fig.width=6,fig.height=6}
-plot(r07+r17, legend = FALSE,main="Veg. Nativa de CMA entre os anos de 2007 e 2017",col=col_uso(4))
-legend("bottomleft", c("Manteve", "Perdas", "Ganhos", "N existente"), fill=c("green", "red", "blue", "white"))
+```{r, echo=FALSE, fig.align='center',fig.width=6,fig.height=6, fig.cap="Figura 3. Alterações na vegetação entre os anos de 2007 e 2017"}
+plot(r07+r17, legend = FALSE,col=col_uso(4))
+legend("bottomleft", c("Sem alterações", "Perdas 2007-2017", "Ganhos2007-2017", "N/A"), fill=c("green", "red", "blue", "white"), cex = 0.85)
 ```
