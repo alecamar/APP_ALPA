@@ -1,0 +1,88 @@
+---
+title: "Teste excluindo coluna"
+author: "PFFernandes"
+date: "18/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução:
+Farei alguns testes de exclusão de colunas e plotagem. Pretendo retirar as linhas contendo os imoveis "cancelados por decisão administrativa".
+
+#### Comando para checar se existem os pacotes em seu PC e baixar caso não possua:
+```{r}
+list.of.packages <- c("raster", "sp", "rgdal", "dplyr", "XML", "curl")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+#### Comando para carregar os pacotes:
+```{r, message=FALSE, warning=FALSE}
+require(raster)
+require(sp)
+require(rgdal)
+require(dplyr)
+require(XML)
+require(curl)
+```
+
+#### Carregar o mapa para o R:
+```{r,warning=FALSE,message=FALSE,results='hide'}
+# Capão Bonito
+CAPAO_car<-readOGR(dsn="../DATA_USE/CAR/Capão_Bonito",layer="AREA_IMOVEL")
+```
+
+#### Visualizar o mapa:
+```{r}
+plot(CAPAO_car)
+```
+
+### Agora plotaremos o mapa utilizando o número de módulos fiscais (NUM_MODULO)
+#### Primeiro tenhamos algo em mente quanto a classificação do imovel rural:
+##### - Pequena Propriedade - Imóvel rural de até 4 módulos fiscais;
+##### - Média Propriedade - Área superior a 4 e até 15 módulos fiscais;
+##### - Grande Propriedade - Área superior a 15 módulos fiscais.
+
+## Plotando:
+#### Plotando Capão Bonito:
+```{r,fig.align='center',fig.width=6,fig.height=6}
+plot(CAPAO_car, col = "transparent", border="transparent", main="Capão Bonito")
+
+# Pequenas propriedades, apenas os n° módulos menores(<) ou iguais(==) 4
+peq_prop <- CAPAO_car@data$NUM_MODULO <= 4
+plot(CAPAO_car[peq_prop,], col = "dark green", border="transparent", add=TRUE)
+
+# Médias propriedades, apenas os n° maiores(>) que 4
+med_prop <- CAPAO_car@data$NUM_MODULO > 4
+# E (&) os n° módulos menores(<) e iguais(==) 15
+med_prop1 <- CAPAO_car@data$NUM_MODULO <= 15
+plot(CAPAO_car[med_prop&med_prop1,], col = "yellow", border="transparent", add=TRUE)
+
+# Grandes propriedades, apenas os n° módulos maiores(>) que 15 
+gra_prop <- CAPAO_car@data$NUM_MODULO > 15
+plot(CAPAO_car[gra_prop,], col = "red", border="transparent", add=TRUE)
+
+legend("topright", c("Pequenas", "Médias", "Grandes"), fill=c("dark green", "yellow", "red"))
+axis(1)
+axis(2)
+```
+
+
+## Testando excluir/nao contabilizar determinadas linhas:
+```{r}
+# Deixa apenas dos dados não cancelados, Situação = AT
+CAPAO_car_ncancel <- subset(CAPAO_car@data, SITUACAO == "AT")
+```
+
+#### Plotando sem os imoveis cancelados:
+
+
+
+
+

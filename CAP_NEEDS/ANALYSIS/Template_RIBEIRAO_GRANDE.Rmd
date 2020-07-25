@@ -1,0 +1,255 @@
+---
+title: "APPs de Ribeirão Grande"
+author: "NEEDS"
+date: "05/2020"
+output: 
+  html_document:
+     
+    includes:
+      after_body: footer.html
+    keep_md: True
+    toc: True
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r, echo=FALSE}
+inline_hook <- function(x) {
+  if (is.numeric(x)) {
+    format(x, digits = 2)
+  } else x
+}
+knitr::knit_hooks$set(inline = inline_hook)
+```
+
+
+```{r, "instala os pacotes", echo=FALSE}
+list.of.packages <- c("rgdal", "sf", "raster", "rgeos", "fields")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+```{r, "executa os pacotes", message=FALSE, warning=FALSE, echo=FALSE}
+require(raster)
+require(rgdal)
+require(rgeos)
+require(sf)
+require(fields)
+```
+
+```{r, "carrega os mapas", echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+Mun_app<-readOGR(dsn="../DATA_USE",layer="SP_3543253_APP", use_iconv=TRUE, encoding="UTF-8")
+Mun_uso<-readOGR(dsn="../DATA_USE",layer="SP_3543253_USO", use_iconv=TRUE, encoding="UTF-8")
+Mun_all<-readOGR(dsn="../DATA_USE",layer="SP_3543253_APP_USO", use_iconv=TRUE, encoding="UTF-8")
+```
+
+```{r, "Nome do município que está sendo trabalhado", echo=FALSE}
+Nome_Mun<-"Ribeirão Grande"
+```
+
+```{r, "Calculos da APP", echo=FALSE, message=FALSE, results='hide', warning=FALSE}
+explode<-function(sp){
+  sp_sf<-as(sp, "sf") #transforma em sf
+  sp_sf_cast = st_cast(sp_sf,"POLYGON") #explode 
+  #sp_explodido<-as(sp_sf_cast, "Spatial")
+}
+
+Mun_app_sf<-explode(Mun_app)
+Mun_uso_sf<-explode(Mun_uso)
+
+Mun_app_sf<-st_buffer(Mun_app_sf, 0)
+Mun_uso_sf<-st_buffer(Mun_uso_sf, 0)
+
+a<-st_intersection(Mun_uso_sf, Mun_app_sf)
+a.col<-st_collection_extract(a, "POLYGON")
+
+##plot(a.col["CLASSE_USO"], border="transparent")
+
+a.col$area<-st_area(a.col)
+a.col$areaHa<-a.col$area/10000
+a.col.df<-a.col
+st_geometry(a.col.df)<-NULL
+
+#head(a.col.df)
+somatoria<-rowsum(a.col.df$areaHa, group=a.col.df$CLASSE_USO)
+somatoria_APP<-rowsum(a.col.df$areaHa, group=a.col.df$HIDRO)
+
+```
+
+# Distribuição das APPs e Uso 
+### Uso do solo
+
+  O município de `r Nome_Mun` possui área total de `r gArea(Mun_uso)/10000`Ha, distribuidos em seis classes de uso que podem ser observadas na tabela abaixo, com suas respectivas áreas totais.
+```{r, "Cria a tabela de classe de uso", echo=FALSE, fig.align='center'}
+tab<-Mun_uso@data[,5:6]
+
+knitr::kable(tab, col.names=c("Classe de uso", "Área (Ha)"))
+
+```
+
+  Na Figura a seguir pode-se observar como esta distribuida essas classes de uso, assim como a sua ocorrência dentro das áreas de preservação permanente(APP) do município de `r Nome_Mun`. 
+```{r, "Uso de solo do Município", echo=FALSE, fig.align='center', fig.width=12, fig.height=8, fig.cap="Figura 1. Uso e cobertura do solo do Município (esquerda) e a presença destas classes de uso dentro das áreas de APP´s (direita)"}
+par(mfrow=c(1,2) )
+plot(Mun_uso, col = "transparent", border="transparent")
+
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
+plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- Mun_uso@data$CLASSE_USO == "área edificada"
+plot(Mun_uso[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- Mun_uso@data$CLASSE_USO == "silvicultura"
+plot(Mun_uso[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- Mun_uso@data$CLASSE_USO == "área antropizada"
+plot(Mun_uso[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- Mun_uso@data$CLASSE_USO == "formação não florestal"
+plot(Mun_uso[nfl,], col = "yellow", border="transparent", add=TRUE)
+
+mag<- Mun_uso@data$CLASSE_USO == "água"
+plot(Mun_uso[mag,], col = "blue", border="transparent", add=TRUE)
+
+legend("bottomleft", c("Floresta", "Formação não florestal", "Silvicultura", "Edificacoes", "Area Antropizada", "Massa d'água"), fill=c("dark green","yellow",
+"purple", "red", "orange", "blue"), cex=0.85)
+
+axis(1)
+axis(2)
+
+##############################################################################################################################################
+
+plot(Mun_all, col = "transparent", border="transparent")
+
+flo <- Mun_all@data$CLASSE_USO == "formação florestal"
+plot(Mun_all[flo,], col = "dark green", border="transparent", add=TRUE)
+
+urb<- Mun_all@data$CLASSE_USO == "área edificada"
+plot(Mun_all[urb,], col = "red", border="transparent", add=TRUE)
+
+sil<- Mun_all@data$CLASSE_USO == "silvicultura"
+plot(Mun_all[sil,], col = "purple", border="transparent", add=TRUE)
+
+ant<- Mun_all@data$CLASSE_USO == "área antropizada"
+plot(Mun_all[ant,], col = "orange", border="transparent", add=TRUE)
+
+nfl<- Mun_all@data$CLASSE_USO == "formação não florestal"
+plot(Mun_all[nfl,], col = "yellow", border="transparent", add=TRUE)
+
+legend("bottomleft", c("Floresta", "Formação não florestal","Silvicultura",
+                     "Edificacoes","Area Antropizada"), fill=c("dark green",
+                     "yellow", "purple", "red", "orange"), cex=0.85)
+axis(1)
+axis(2)
+```
+  
+  Na figura abaixo, encontra-se em destaque forma na qual as APP´s se distribuem, interligando fragmentos florestais existentes dentro do município, assim como o tamanho do curso d'água correspondente.
+```{r, "Florestas e tipos de APP", echo=FALSE, fig.align='center', fig.width=12, fig.height=8, fig.cap="Figura 2. Fragmentos florestais e distribuição das APP's dentro do município (esquerda) e quais tipos de corpos d'água compõe a rede (direita)"}
+
+
+par(mfrow=c(1,2) )
+
+plot(Mun_uso, col = "transparent", border="transparent")
+
+flo <- Mun_uso@data$CLASSE_USO == "formação florestal"
+plot(Mun_uso[flo,], col = "dark green", border="transparent", add=TRUE)
+plot(Mun_app, col="black", border="transparent", add=TRUE)
+
+legend("bottomleft", c("Fragmentos Florestais", "APPs"),
+                     fill=c("dark green", "black"), cex = 0.8)
+axis(1)
+axis(2)
+
+#################################################################################################################################################
+
+plot(Mun_app, col = "transparent", border="transparent")
+
+app_cda_0_10 <- Mun_app@data$HIDRO == "curso d'água (0 - 10m)"
+plot(Mun_app[app_cda_0_10,], col = "dark green", border="transparent", add=TRUE)
+
+app_cda_10_50<- Mun_app@data$HIDRO == "curso d'água (10 - 50m)"
+plot(Mun_app[app_cda_10_50,], col = "yellow", border="transparent", add=TRUE)
+
+app_cda_50_200<- Mun_app@data$HIDRO == "curso d'água (50 - 200m)"
+plot(Mun_app[app_cda_50_200,], col = "purple", border="transparent", add=TRUE)
+
+mda<- Mun_app@data$HIDRO == "massa d'água"
+plot(Mun_app[mda,], col = "blue", border="transparent", add=TRUE)
+
+app_nascente<- Mun_app@data$HIDRO == "nascente"
+plot(Mun_app[app_nascente,], col = "red", border="transparent", add=TRUE)
+
+legend("bottomleft", c("APP curso d'água 0-10m", "APP curso d'água 10-50m", 
+                     "APP curso d'água 50-200m", "APP nascentes", "Massa d'água"),
+                     fill=c("dark green", "yellow", "purple", "red", "blue"), 
+                     cex = 0.8)
+axis(1)
+axis(2)
+```
+
+  Existem, ao todo, `r colSums(somatoria_APP)` hectáres de APP no município de `r Nome_Mun`, na tabela abaixo é observado os valores em hectáres para cada uma das categorias apresentadas na Figura 2.
+
+```{r, "Cria a tabela de area de cada tipo de APP", echo=FALSE, fig.align='center'}
+knitr::kable(t(somatoria_APP))
+```
+
+  Já para as classes de uso apresentadas na Figura 1, a área está distribuida da seguinte forma:
+
+```{r, "Cria a tabela de classe de uso dentro das APPs", echo=FALSE, fig.align='center'}
+knitr::kable(t(somatoria))
+```
+  
+  
+### Valores de APP faltando
+  Dessa forma, contabilizando o total de APP existente e os diferentes usos existentes, estima-se que o total de APP a ser restaurado em `r Nome_Mun` é de `r somatoria[2,]+somatoria[3,]+somatoria[6,]` ha, o que corresponde a `r 100*((somatoria[2,]+somatoria[3,]+somatoria[6,])/colSums(somatoria))` % do total de APPs do município.  
+  Para ajudar em um possível processo de priorização de áreas para a recuperação é importante que os dados sejam mostrados de uma forma mais minuciosa. Com isso a seguir pode-se observar as proporções de uso dentro de cada tipo de APP mostrada anteriormente.
+  
+```{r, "Calculos da APP individuais", echo=FALSE, message=FALSE, results='hide'}
+
+a.nasc<-a.col.df[a.col.df$HIDRO=="nascente",]
+soma_nasc<-rowsum(a.nasc$areaHa, group=a.nasc$CLASSE_USO)
+
+a.cda_10<-a.col.df[a.col.df$HIDRO=="curso d'água (0 - 10m)",]
+soma_cda_10<-rowsum(a.cda_10$areaHa, group=a.cda_10$CLASSE_USO)
+
+a.cda_50<-a.col.df[a.col.df$HIDRO=="curso d'água (10 - 50m)",]
+soma_cda_50<-rowsum(a.cda_50$areaHa, group=a.cda_50$CLASSE_USO)
+
+a.cda_200<-a.col.df[a.col.df$HIDRO=="curso d'água (50 - 200m)",]
+soma_cda_200<-rowsum(a.cda_200$areaHa, group=a.cda_200$CLASSE_USO)
+
+```
+  **Nascente**
+```{r, "tabelas das APPs nascentes", echo=FALSE}
+mun_nasc<-cbind(soma_nasc[,1],(soma_nasc[,1]/colSums(soma_nasc))*100)
+colnames(mun_nasc)<-c("Área (Ha)", "(%)")
+knitr::kable(t(mun_nasc))
+```
+ 
+  **Corpo d'água 0 - 10m**
+```{r, "tabelas das APPs cda 10", echo=FALSE}
+mun_cda_10<-cbind(soma_cda_10[,1],(soma_cda_10[,1]/colSums(soma_cda_10))*100)
+colnames(mun_cda_10)<-c("Área (Ha)", "(%)")
+knitr::kable(t(mun_cda_10))
+```
+  
+  **Corpo d'água 10 - 50m**
+```{r, "tabelas das APPs cda 50", echo=FALSE}
+mun_cda_50<-cbind(soma_cda_50[,1],(soma_cda_50[,1]/colSums(soma_cda_50))*100)
+colnames(mun_cda_50)<-c("Área (Ha)", "(%)")
+knitr::kable(t(mun_cda_50))
+```
+
+Com isso, temos:  
+  
+  * Nascente: O total de APP, dispostas em nascentes, a ser restaurado em `r Nome_Mun` é de `r soma_nasc[2,]+soma_nasc[5,]` ha, o que corresponde a `r 100*((soma_nasc[2,]+soma_nasc[5,])/colSums(soma_nasc))` % do total de APPs presentes apenas em nascentes do município.
+  
+  * Corpos d'água 0 - 10m: O total de APP, dispostas em corpos d'água 0 - 10m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_10[2,]+soma_cda_10[3,]+soma_cda_10[6,]` ha, o que corresponde a `r 100*((soma_cda_10[2,]+soma_cda_10[3,]+soma_cda_10[6,])/colSums(soma_cda_10))` % do total de APPs presentes apenas em corpos d'água 0 - 10m do município.
+
+  * Corpos d'água 10 - 50m: O total de APP, dispostas em corpos d'água 10 - 50m, a ser restaurado em `r Nome_Mun` é de `r soma_cda_50[2,]+soma_cda_50[5,]` ha, o que corresponde a `r 100*((soma_cda_50[2,]+soma_cda_50[5,])/colSums(soma_cda_50))` % do total de APPs presentes apenas em corpos d'água 10 - 50m do município.
+
+  
+

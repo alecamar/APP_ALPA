@@ -1,0 +1,157 @@
+---
+title: "CAR - Sudoeste Paulista"
+author: "PFFernandes"
+date: "12/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução:
+Nesse script buscamos analisar os dados shapefile do Cadastro Ambiental Rural(CAR) para os municipio do Sudoeste Paulista, do site "http://www.car.gov.br/publico/imoveis/index", carregar, plotar e realizar algumas analises.
+
+Lembrando que utilizamos o shapefile editado sem os imoveis tidos como "cancelados por decisão administrativa".
+
+#### Comando para checar se existem os pacotes em seu PC e baixar caso não possua:
+```{r}
+list.of.packages <- c("raster", "sp", "rgdal", "dplyr", "XML", "curl")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+#### Comando para carregar os pacotes:
+```{r, message=FALSE, warning=FALSE}
+require(raster)
+require(sp)
+require(rgdal)
+require(dplyr)
+require(XML)
+require(curl)
+```
+
+#### Carregar os mapas do Sudoeste Paulista para o R:
+```{r,warning=FALSE,message=FALSE,results='hide'}
+ALL_car<-readOGR(dsn="../DATA_USE/CAR_UNION_EDIT",layer="CAR_ALL_MUN")
+```
+
+#### Visualizar o mapa:
+```{r}
+plot(ALL_car)
+```
+
+### Agora plotaremos o mapa utilizando o número de módulos fiscais (NUM_MODULO)
+#### Primeiro tenhamos algo em mente quanto a classificação do imovel rural:
+##### - Pequena Propriedade - Imóvel rural de até 4 módulos fiscais;
+##### - Média Propriedade - Área superior a 4 e até 15 módulos fiscais;
+##### - Grande Propriedade - Área superior a 15 módulos fiscais.
+
+## Plotando:
+#### Plotando Todos os municipios do Sudoeste Paulista:
+```{r,fig.align='center',fig.width=6,fig.height=6}
+plot(ALL_car, col = "transparent", border="transparent", main="Prodiedades rurais do Sudoeste Paulista")
+
+# Pequenas propriedades, apenas os n° módulos menores(<) ou iguais(==) 4
+peq_prop <- ALL_car@data$NUM_MODULO <= 4
+plot(ALL_car[peq_prop,], col = "dark green", border="transparent", add=TRUE)
+
+# Médias propriedades, apenas os n° maiores(>) que 4
+med_prop <- ALL_car@data$NUM_MODULO > 4
+# E (&) os n° módulos menores(<) e iguais(==) 15
+med_prop1 <- ALL_car@data$NUM_MODULO <= 15
+plot(ALL_car[med_prop&med_prop1,], col = "yellow", border="transparent", add=TRUE)
+
+# Grandes propriedades, apenas os n° módulos maiores(>) que 15 
+gra_prop <- ALL_car@data$NUM_MODULO > 15
+plot(ALL_car[gra_prop,], col = "red", border="transparent", add=TRUE)
+
+legend("topright", c("Pequenas", "Médias", "Grandes"), fill=c("dark green", "yellow", "red"))
+axis(1)
+axis(2)
+```
+
+## Analises:
+
+#### Quantidade total de imoveis rurais:
+```{r}
+nrow(ALL_car)
+n_prop<- nrow(ALL_car)
+```
+
+#### Quantidades de pequenas propriedades:
+```{r}
+sum(peq_prop)
+
+# Porcentagem
+n_p<- sum(peq_prop)
+(n_p/n_prop)*100 
+```
+
+#### Quantidade de imoveis de médias propriedades:
+```{r}
+sum(med_prop&med_prop1)
+
+# Porcentagem
+n_m<- sum(med_prop&med_prop1)
+(n_m/n_prop)*100 
+```
+
+#### Quantidade de imoveis de grandes propriedades:
+```{r}
+sum(gra_prop)
+
+# Porcentagem
+n_g<- sum(gra_prop)
+(n_g/n_prop)*100 
+```
+## Quantidade total de área/hectares:
+```{r}
+sum(ALL_car@data$NUM_AREA)
+
+ha<- sum(ALL_car@data$NUM_AREA)
+```
+
+
+#### Quantidade total de área/hectares de pequenas propriedades:
+```{r}
+41825.25+160246.8
+
+# Porcentagem
+ha_p<- (41825.25+160246.8)
+(ha_p/ha)*100 
+```
+
+#### Quantidade total de área/hectares de medias propriedades:
+```{r}
+38219.37+155817.3
+
+# Porcentagem
+ha_m<- (38219.37+155817.3)
+(ha_m/ha)*100 
+```
+
+#### Quantidade total de área/hectares de grandes propriedades:
+```{r}
+125299.4+364962
+
+# Porcentagem
+ha_g<- (125299.4+364962)
+(ha_g/ha)*100 
+```
+
+
+## Histograma:
+```{r, fig.align='center'}
+hist(ALL_car@data$NUM_AREA,breaks=25000,xlim = c(0,80), ylim = c(0,1000),
+     main = "", 
+     xlab = "Hectares", ylab = "Número de Imóveis", 
+     col = c("grey"), 
+     border = TRUE)
+```
+
+
+

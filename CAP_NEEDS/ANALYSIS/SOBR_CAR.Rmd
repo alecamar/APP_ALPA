@@ -1,0 +1,101 @@
+---
+title: "Sobreposição do CAR"
+author: "PFFernandes"
+date: "17/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução:
+Nesse script buscamos realizar algumas analises para as sobreposições encontradas no CAR.
+
+- rgeos
+
+
+#### Comando para checar se existem os pacotes em seu PC e baixar caso não possua:
+```{r}
+list.of.packages <- c("raster", "sp", "rgdal", "dplyr", "XML", "curl","rgeos")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+#### Comando para carregar os pacotes:
+```{r, message=FALSE, warning=FALSE}
+require(raster)
+require(sp)
+require(rgdal)
+require(dplyr)
+require(XML)
+require(curl)
+require(rgeos)
+```
+
+#### Carregar o mapa para o R:
+```{r,warning=FALSE,message=FALSE,results='hide'}
+# Capão Bonito
+CAPAO_car<-readOGR(dsn="../DATA_USE/CAR/Capão_Bonito",layer="AREA_IMOVEL")
+
+# Ribeirão Grande
+RIBEI_car<-readOGR(dsn="../DATA_USE/CAR/Ribeirão_Grande",layer="AREA_IMOVEL")
+```
+
+#### Visualizar o mapa:
+```{r}
+plot(CAPAO_car)
+plot(RIBEI_car)
+```
+
+## Testando a interseção para veririficar a sobreposição de 2 mapas:
+
+#### Acessar o HELP para gIntersection:
+```{r}
+?gIntersection
+```
+
+#### Interseção entre dois mapas:
+```{r}
+gIntersection(CAPAO_car, RIBEI_car)
+
+ALL <- gIntersection(CAPAO_car, RIBEI_car)
+```
+Com esse perdemos o data frame e ele se transforma em SpatialCollections
+
+#### Plotando a interseção:
+```{r}
+plot(ALL)
+```
+
+#### Resolvendo o problemas de sobreposição:
+```{r}
+ALL4 <- gIntersection(CAPAO_car, RIBEI_car, byid = TRUE,  drop_lower_td = TRUE)
+```
+
+#### Usando um buffer para o Capão:
+```{r}
+CAPAO_car@data
+head(CAPAO_car@data)
+X1 <- gBuffer(CAPAO_car, byid=TRUE, width=0)
+```
+Alterar o georeferenciamento......
+
+
+#### Criação de buffer de 0 metros para corrigir imperfeições:
+```{r}
+buffer <- 
+  
+gStab2<- function(X, Y) {
+  X1 <- gBuffer(X, byid=TRUE, width=0)
+  Y2 <- gBuffer(Y, byid=TRUE, width=0)
+  stab <- gIntersection(gUnionCascaded(X1), gUnionCascaded(Y2), byid = TRUE)
+  stab<-stab@polyobj
+}
+```
+
+
+

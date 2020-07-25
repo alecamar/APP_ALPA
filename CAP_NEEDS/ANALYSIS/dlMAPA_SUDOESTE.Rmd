@@ -1,0 +1,125 @@
+---
+title: "MUNIC_ALL"
+author: "JCLAraujo & PFFernandes"
+date: "29/05/2020"
+output: 
+  html_document:
+    keep_md: True
+  
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introdução
+Aqui vamos apenas carregar os mapas baixados da semana passada e plota-los no R
+
+# Passos
+Para conseguir usar o comando para a leitura do shapefile será necessário que rgdal esteja instalado e ativo.
+```{r, eval=FALSE}
+install.packages(c('sp', 'rgdal', 'dplyr', 'XML', 'curl'))
+```
+
+Load packages
+```{r}
+
+library(sp)
+library(rgdal)
+library(dplyr)
+library(XML)
+library(curl)
+```
+
+Script para download dos dados.
+```{r, "Script semana passada corrigido", eval=FALSE}
+#dir.create("./data_use")
+
+
+#BARÃO DE ANTONINA
+lista.files.uso.BDA = readLines('http://geo.fbds.org.br/SP/BARAO_DE_ANTONINA/USO/')
+lista.files.app.BDA = readLines('http://geo.fbds.org.br/SP/BARAO_DE_ANTONINA/APP/')
+
+
+#BOM SUCESSO DE ITARARÉ
+lista.files.uso.BSI = readLines('http://geo.fbds.org.br/SP/BOM_SUCESSO_DE_ITARARE/USO/')
+lista.files.app.BSI = readLines('http://geo.fbds.org.br/SP/BOM_SUCESSO_DE_ITARARE/APP/')
+
+
+#BURI
+lista.files.uso.BURI = readLines('http://geo.fbds.org.br/SP/BURI/USO/')
+lista.files.app.BURI = readLines('http://geo.fbds.org.br/SP/BURI/APP/')
+
+
+#CAMPÃO BONITO
+lista.files.uso.CB = readLines('http://geo.fbds.org.br/SP/CAPAO_BONITO/USO/')
+lista.files.app.CB = readLines('http://geo.fbds.org.br/SP/CAPAO_BONITO/APP/')
+
+
+#CORONEL MACEDO
+lista.files.uso.CM = readLines('http://geo.fbds.org.br/SP/CORONEL_MACEDO/USO/')
+lista.files.app.CM = readLines('http://geo.fbds.org.br/SP/CORONEL_MACEDO/APP/')
+
+
+#GUAPIARA
+lista.files.uso.GUAPIARA = readLines('http://geo.fbds.org.br/SP/GUAPIARA/USO/')
+lista.files.app.GUAPIARA = readLines('http://geo.fbds.org.br/SP/GUAPIARA/APP/')
+
+#ITABERÁ
+lista.files.uso.ITABERA = readLines('http://geo.fbds.org.br/SP/ITABERA/USO/')
+lista.files.app.ITABERA = readLines('http://geo.fbds.org.br/SP/ITABERA/APP/')
+
+
+#ITAPEVA
+lista.files.uso.ITAPEVA = readLines('http://geo.fbds.org.br/SP/ITAPEVA/USO/')
+lista.files.app.ITAPEVA = readLines('http://geo.fbds.org.br/SP/ITAPEVA/APP/')
+
+
+#ITAPORANGA
+lista.files.uso.ITAPORANGA = readLines('http://geo.fbds.org.br/SP/ITAPORANGA/USO/')
+lista.files.app.ITAPORANGA = readLines('http://geo.fbds.org.br/SP/ITAPORANGA/APP/')
+
+
+#ITARARÉ
+lista.files.uso.ITARARE = readLines('http://geo.fbds.org.br/SP/ITARARE/USO/')
+lista.files.app.ITARARE = readLines('http://geo.fbds.org.br/SP/ITARARE/APP/')
+
+
+#NOVA CAMPINA
+lista.files.uso.NC = readLines('http://geo.fbds.org.br/SP/NOVA_CAMPINA/USO/')
+lista.files.app.NC = readLines('http://geo.fbds.org.br/SP/NOVA_CAMPINA/APP/')
+
+
+#RIBEIRÃO GRANDE
+lista.files.uso.RG = readLines('http://geo.fbds.org.br/SP/RIBEIRAO_GRANDE/USO/')
+lista.files.app.RG = readLines('http://geo.fbds.org.br/SP/RIBEIRAO_GRANDE/APP/')
+
+
+#RIVERSUL
+lista.files.uso.RIVERSUL = readLines('http://geo.fbds.org.br/SP/RIVERSUL/USO/')
+lista.files.app.RIVERSUL = readLines('http://geo.fbds.org.br/SP/RIVERSUL/APP/')
+
+
+#TAQUARITUBA
+lista.files.uso.TAQUARITUBA = readLines('http://geo.fbds.org.br/SP/TAQUARITUBA/USO/')
+lista.files.app.TAQUARITUBA = readLines('http://geo.fbds.org.br/SP/TAQUARITUBA/APP/')
+
+
+#TAQUARIVAÍ
+lista.files.uso.TAQUARIVAI = readLines('http://geo.fbds.org.br/SP/TAQUARIVAI/USO/')
+lista.files.app.TAQUARIVAI = readLines('http://geo.fbds.org.br/SP/TAQUARIVAI/APP/')
+
+
+lks.lista<-c(lista.files.uso.BURI,lista.files.app.BURI,lista.files.uso.CB,lista.files.app.CB,lista.files.uso.BDA,lista.files.app.BDA,lista.files.uso.BSI,lista.files.app.BSI,lista.files.uso.CM,lista.files.app.CM,lista.files.uso.GUAPIARA,lista.files.app.GUAPIARA,lista.files.uso.ITABERA,lista.files.app.ITABERA,lista.files.uso.ITAPEVA,lista.files.app.ITAPEVA,lista.files.uso.ITAPORANGA,lista.files.app.ITAPORANGA,lista.files.uso.ITARARE,lista.files.app.ITARARE,lista.files.uso.NC,lista.files.app.NC,lista.files.uso.RG,lista.files.app.RG,lista.files.uso.RIVERSUL,lista.files.app.RIVERSUL,lista.files.uso.TAQUARITUBA,lista.files.app.TAQUARITUBA,lista.files.uso.TAQUARIVAI,lista.files.app.TAQUARIVAI)
+
+
+lks<-getHTMLLinks(lks.lista, xpQuery = "//a/@href[contains(., 'SP')]")
+for (i in 1:(length(lks))){
+  destf<-paste("../DATA_USE", strsplit(lks[i], "/")[[1]][5], sep="/")
+  curl_download((paste("http://geo.fbds.org.br", lks[i], sep="")),destfile = destf)
+}
+
+```
+
+
+
+

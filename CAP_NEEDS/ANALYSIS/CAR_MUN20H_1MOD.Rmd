@@ -1,0 +1,65 @@
+---
+title: "CAR dos municipios com 20Ha = 1mód."
+author: "PFFernandes"
+date: "12/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Comando para checar se existem os pacotes em seu PC e baixar caso não possua:
+```{r}
+list.of.packages <- c("raster", "sp", "rgdal", "dplyr", "XML", "curl")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+#### Comando para carregar os pacotes:
+```{r, message=FALSE, warning=FALSE}
+require(raster)
+require(sp)
+require(rgdal)
+require(dplyr)
+require(XML)
+require(curl)
+```
+
+#### Carregar os mapas do Sudoeste Paulista para o R:
+```{r,warning=FALSE,message=FALSE,results='hide'}
+# Municipios com 20 ha = 1 módulo fiscal
+vinte_ha_car<-readOGR(dsn="../DATA_USE/CAR_UNION_EDIT",layer="CAR_20HA_1MOD")
+```
+
+
+
+## Analises:
+
+#### Quantidade total de área/hectares:
+```{r}
+sum(vinte_ha_car@data$NUM_AREA)
+```
+
+#### Quantidade total de área/hectares de pequenas propriedades:
+```{r}
+ha_peq_prop <- vinte_ha_car[vinte_ha_car@data$NUM_AREA <= 80.000000,]
+sum(ha_peq_prop@data$NUM_AREA)
+```
+
+#### Quantidade total de área/hectares de médias propriedades:
+```{r}
+ha_med_prop <- vinte_ha_car@data$NUM_AREA > 80.000000
+ha_med1_prop<- vinte_ha_car@data$NUM_AREA <= 300.000000
+ha_med2_prop <- vinte_ha_car[ha_med_prop&ha_med1_prop,]
+sum(ha_med2_prop@data$NUM_AREA)
+```
+
+#### Quantidade total de área/hectares de grandes propriedades:
+```{r}
+ha_gra_prop <- vinte_ha_car[vinte_ha_car@data$NUM_AREA > 300.000000,]
+sum(ha_gra_prop@data$NUM_AREA)
+```

@@ -1,0 +1,131 @@
+---
+title: "APPS SUDOESTE"
+author: "NEEDS"
+date: "05/2020"
+output: 
+  html_document:
+     
+    includes:
+      after_body: footer.html
+    keep_md: True
+    toc: True
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r, echo=FALSE}
+inline_hook <- function(x) {
+  if (is.numeric(x)) {
+    format(x, digits = 2)
+  } else x
+}
+knitr::knit_hooks$set(inline = inline_hook)
+```
+
+
+
+```{r, "instala os pacotes", echo=FALSE}
+list.of.packages <- c("rgdal", "sf", "raster", "rgeos", "fields")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) 
+
+install.packages(new.packages)
+```
+
+```{r, "executa os pacotes", message=FALSE, warning=FALSE, echo=FALSE}
+require(raster)
+require(rgdal)
+require(rgeos)
+require(sf)
+require(fields)
+require(dplyr)
+```
+
+```{r, "carrega os mapas", echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+mapa_CAR<-readOGR(dsn="../DATA_USE",layer="TESTE_MAPA", use_iconv=TRUE, encoding="UTF-8")
+mapa_APP<-readOGR(dsn="../DATA_USE",layer="SP_3505005_APP", use_iconv=TRUE, encoding="UTF-8")
+```
+
+```{r, "Não rodar"}
+explode<-function(sp){
+  sp_sf<-as(sp, "sf") #transforma em sf
+  sp_sf_cast = st_cast(sp_sf,"POLYGON") #explode 
+  #sp_explodido<-as(sp_sf_cast, "Spatial")
+}
+
+#Transforma os obj sp em sf
+mapa_car_sf<-explode(mapa_CAR)
+mapa_app_sf<-explode(mapa_APP)
+
+mapa_app_sf<-st_buffer(mapa_app_sf, 0)
+mapa_car_sf<-st_buffer(mapa_car_sf, 0)
+
+a<-st_intersection(mapa_car_sf, mapa_app_sf)
+a.col<-st_collection_extract(a, "POLYGON")
+
+a.col$area<-st_area(a.col)
+a.col$areaHa<-a.col$area/10000
+a.col.df<-a.col
+st_geometry(a.col.df)<-NULL
+
+
+```
+
+```{r}
+#clip<-function(area2clip, clippingArea){
+#
+#  gI <- gIntersects(area2clip, clippingArea, byid = TRUE )
+#  out <- lapply( which(gI) , function(x){ gIntersection( area2clip[x,] , clippingArea) } )
+#
+#  keep <- sapply(out, class)
+#  out <- out[keep == "SpatialPolygons"]
+#
+#
+# # Coerce list back to SpatialPolygons object
+#  clip.out.r <- SpatialPolygons( lapply( 1:length( out ) , function(i) { Pol <- slot(out[[i]], "polygons")[[1]];
+#  slot(Pol, "ID") <- as.character(i)
+#  Pol
+#  }))
+
+#}
+
+#Separa as propriedades por tamanhos
+micro<-mapa_CAR[mapa_CAR@data$NUM_MODULO<1,]
+pequena_1_2<-mapa_CAR[mapa_CAR@data$NUM_MODULO>=1 & mapa_CAR@data$NUM_MODULO<2,]
+pequena_2_4<-mapa_CAR[mapa_CAR@data$NUM_MODULO>=2 & mapa_CAR@data$NUM_MODULO<4,]
+media<-mapa_CAR[mapa_CAR@data$NUM_MODULO>=4 & mapa_CAR@data$NUM_MODULO<10,]
+grande<-mapa_CAR[mapa_CAR@data$NUM_MODULO>=10,]
+
+class(micro)
+class(mapa_APP)
+
+str(micro, max.level=2)
+str(mapa_APP, max.level=2)
+
+#app_micro<-clip(mapa_APP,micro)
+
+
+gI <- gIntersects(mapa_APP, micro, byid = TRUE )
+
+vetor<-which(gI)
+
+a<-for (i in 1:(length(vetor))) {
+   out <- gIntersection(mapa_APP[vetor[i],], micro)
+}
+
+str(mapa_APP, max.level=2)
+
+mapa_APP@polygons[1]
+
+  keep <- sapply(out, class)
+  out <- out[keep == "SpatialPolygons"]
+
+
+  # Coerce list back to SpatialPolygons object
+  clip.out.r <- SpatialPolygons( lapply( 1:length( out ) , function(i) { Pol <- slot(out[[i]], "polygons")[[1]];
+  slot(Pol, "ID") <- as.character(i)
+  Pol}))
+```
+
